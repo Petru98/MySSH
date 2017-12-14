@@ -1,0 +1,8 @@
+.ignore/
+.vscode/
+
+**/.obj/
+**/.d/
+
+myssh-server
+myssh-client
