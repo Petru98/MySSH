@@ -13,6 +13,7 @@ BINS := $(SERVERNAME) $(CLIENTNAME)
 # Paths to target root directories
 export SERVERDIR := server
 export CLIENTDIR := client
+export SHAREDDIR := shared
 
 
 
@@ -23,29 +24,37 @@ export CLIENTDIR := client
 all: $(BINS)
 
 # Build binary files
-$(SERVERNAME): $(SERVERDIR)
+$(SERVERNAME): $(SERVERDIR)/$(SERVERNAME)
 	@$(CP) $(SERVERDIR)/$(SERVERNAME) $(SERVERNAME)
 
-$(CLIENTNAME): $(CLIENTDIR)
+$(CLIENTNAME): $(CLIENTDIR)/$(CLIENTNAME)
 	@$(CP) $(CLIENTDIR)/$(CLIENTNAME) $(CLIENTNAME)
 
-# Bulid server/client
-$(SERVERDIR):
+# Build server/client/shared
+$(SERVERDIR)/$(SERVERNAME): $(SHAREDDIR)
 	@$(MAKE) -C $(SERVERDIR)
 
-$(CLIENTDIR):
+$(CLIENTDIR)/$(CLIENTNAME): $(SHAREDDIR)
 	@$(MAKE) -C $(CLIENTDIR)
+
+$(SHAREDDIR):
+	@$(MAKE) -C $(SHAREDDIR)
 
 
 
 # Clean intermediary files only
-clean: clean-server clean-client
+clean: clean-server clean-client clean-shared
 
 clean-server:
-	@$(MAKE) -C $(SERVERDIR) clean
+	@$(RM) $(SERVERNAME) \
+	;$(MAKE) -C $(SERVERDIR) clean
 
 clean-client:
-	@$(MAKE) -C $(CLIENTDIR) clean
+	@$(RM) $(CLIENTNAME) \
+	;$(MAKE) -C $(CLIENTDIR) clean
+
+clean-shared:
+	@$(MAKE) -C $(SHAREDDIR) clean
 
 
 
@@ -59,4 +68,4 @@ print-%:
 ############################ Others ############################
 ################################################################
 # These targets are not files or directories
-.PHONY: all clean clean-server clean-client print-%
+.PHONY: all clean clean-server clean-client clean-shared print-% $(SHAREDDIR)

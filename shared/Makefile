@@ -4,15 +4,7 @@
 # Shell commands
 RM := rm -f
 MV := mv -f
-LN := ln -f
 MKDIR := mkdir -p
-
-# The name of the final binary file
-ifdef CLIENTNAME
-    NAME := $(CLIENTNAME)
-else
-    NAME := $(shell $(MAKE) -s -C .. print-CLIENTNAME)
-endif
 
 
 
@@ -33,9 +25,6 @@ endif
 OBJDIR := .obj
 DEPDIR := .d
 
-# Final binary files directories
-BINS := $(NAME)
-
 
 
 ifneq (clean,$(TARGET))
@@ -46,22 +35,9 @@ ifneq (clean,$(TARGET))
 
 
 
-    # The directory with all the shared source/object files
-    ifdef SHAREDDIR
-        SHAREDDIR := ../$(SHAREDDIR)
-    else
-        SHAREDDIR := ../$(shell $(MAKE) -s -C .. print-SHAREDDIR)
-    endif
-
-    SHAREDINCDIR := $(SHAREDDIR)/include
-    SHAREDOBJDIR := $(shell $(MAKE) -s -C $(SHAREDDIR) print-OBJDIR)
-    SHAREDOBJS   := # $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep )
-
-
-
     # Root directory for source files & additional include/library directories
     SRCDIR := src
-    INCDIR := include $(SHAREDINCDIR)
+    INCDIR := include
     LIBDIR := lib
 
 
@@ -112,13 +88,7 @@ endif
 ######################## Build targets #########################
 ################################################################
 # Build all
-all: $(BINS)
-
-# Build binary files
-$(NAME): $(OBJS)
-	@echo "Linking"     \
-	;$(MKDIR) $(dir $@) \
-	;$(LD) $(LDFLAGS) -o $@ $^ $(SHAREDOBJS) $(LDLIBS)
+all: $(OBJS)
 
 
 
@@ -176,7 +146,7 @@ print-%:
 
 # Clean intermediary files only
 clean:
-	@$(RM) -r $(OBJDIR) $(DEPDIR) $(BINS)
+	@$(RM) -r $(OBJDIR) $(DEPDIR)
 
 
 

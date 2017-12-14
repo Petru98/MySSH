@@ -8,7 +8,7 @@ MKDIR := mkdir -p
 
 # The name of the final binary file
 ifdef SERVERNAME
-    NAME := SERVERNAME
+    NAME := $(SERVERNAME)
 else
     NAME := $(shell $(MAKE) -s -C .. print-SERVERNAME)
 endif
@@ -45,9 +45,22 @@ ifneq (clean,$(TARGET))
 
 
 
+    # The directory with all the shared source/object files
+    ifdef SHAREDDIR
+        SHAREDDIR := ../$(SHAREDDIR)
+    else
+        SHAREDDIR := ../$(shell $(MAKE) -s -C .. print-SHAREDDIR)
+    endif
+
+    SHAREDINCDIR := $(SHAREDDIR)/include
+    SHAREDOBJDIR := $(SHAREDDIR)/.obj
+    SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep tinyxml2)
+
+
+
     # Root directory for source files & additional include/library directories
     SRCDIR := src
-    INCDIR := include ../include
+    INCDIR := include $(SHAREDINCDIR)
     LIBDIR := lib
 
 
@@ -69,7 +82,7 @@ ifneq (clean,$(TARGET))
 
     # Preprocessor/C/C++/Linker flags
     CPPFLAGS := -DNDEBUG
-    CFLAGS   := -Wall -Wextra -ggdb # TODO: -O3
+    CFLAGS   := -Wall -Wextra -O3
     CXXFLAGS := -std=c++17
     LDFLAGS  :=
 
@@ -104,7 +117,7 @@ all: $(BINS)
 $(NAME): $(OBJS)
 	@echo "Linking"     \
 	;$(MKDIR) $(dir $@) \
-	;$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	;$(LD) $(LDFLAGS) -o $@ $^ $(SHAREDOBJS) $(LDLIBS)
 
 
 
