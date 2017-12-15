@@ -69,7 +69,7 @@ ifneq (clean,$(TARGET))
     SRCS := $(shell find $(SRCDIR) -type f -name "*.cpp") \
             $(shell find $(SRCDIR) -type f -name "*.c")
 
-    LIBS :=
+    LIBS := pthread
 
     # Full paths to object/dependency files
     OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.cpp.o,$(filter %.cpp,$(SRCS))) \
