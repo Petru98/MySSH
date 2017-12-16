@@ -44,43 +44,41 @@ public:
 public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Default constructor.
-    /// \details No thread is created. You have to call launch.
+    /// \details No thread is created. You have to call launch().
     ////////////////////////////////////////////////////////////////////////////////
     Thread();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Move constructor.
-    /// \details The thread that will become invalid
-    /// \param that [in] The thread to move from
+    /// \details The thread \a that will become invalid
+    /// \param that The thread to move from
     ////////////////////////////////////////////////////////////////////////////////
     Thread(Thread&& that);
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Create and start thread from callable and arguments.
-    /// \details The callable can be a function pointer, functor or lambda. If the
-    ///          object already own a joinable thread then InvalThreadError is
-    ///          thrown. If an error occurs then CreateError is thrown.
-    /// \param func [in] The callable object
-    /// \param args [in, out] The arguments for the thread
+    /// \brief Create and start thread.
+    /// \details This constructor calls launch().
+    /// \param func The callable object used as entry point
+    /// \param args The arguments for the thread
     ////////////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Args>
     Thread(F func, Args&&... args);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Destructor
-    /// \details If the thread is joinable then join will be called.
+    /// \details If the thread is joinable then join() will be called.
     ////////////////////////////////////////////////////////////////////////////////
     ~Thread();
 
 
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Create and start thread from callable and arguments.
+    /// \brief Create and start thread.
     /// \details The callable can be a function pointer, functor or lambda. If the
     ///          object already own a joinable thread then InvalThreadError is
     ///          thrown. If an error occurs then CreateError is thrown.
-    /// \param func [in] The callable object
-    /// \param args [in, out] The arguments for the thread
+    /// \param func The callable object used as entry point
+    /// \param args The arguments for the thread
     /// \return Reference to the object the method was called on
     ////////////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Args>
@@ -94,7 +92,7 @@ public:
     ///          but cannot be joined. This function will remove the object's
     ///          ownership over the thread. If an error occurs then DetachError is
     ///          thrown.
-    /// \sa isJoinable join
+    /// \sa isJoinable(), join()
     ////////////////////////////////////////////////////////////////////////////////
     void detach();
 
@@ -102,7 +100,7 @@ public:
     /// \brief Wait until the thread returns or exits.
     /// \details If the thread is not joinable then this method does nothing. If an
     ///          error occurs then JoinError is thrown.
-    /// \sa isJoinable
+    /// \sa isJoinable()
     ////////////////////////////////////////////////////////////////////////////////
     void join();
 
@@ -113,7 +111,7 @@ public:
     /// \details A thread is joinable if it exists, is not detached and does not
     ///          represent the current thread.
     /// \return True if thread is joinable
-    /// \sa detach selfId join
+    /// \sa detach(), selfId(), join()
     ////////////////////////////////////////////////////////////////////////////////
     bool isJoinable() const;
 
@@ -121,7 +119,7 @@ public:
     /// \brief Get thread's id.
     /// \details If the thread is not joinable then InvalThreadError is thrown.
     /// \return Thread's id
-    /// \sa selfId
+    /// \sa selfId()
     ////////////////////////////////////////////////////////////////////////////////
     pthread_t getId() const;
 
@@ -135,7 +133,7 @@ public:
 
 private:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Entry point for the threads.
+    /// \brief Actual entry point for the threads.
     ////////////////////////////////////////////////////////////////////////////////
     template <typename Callable>
     static void* entryPoint(void* userdata);
@@ -248,3 +246,84 @@ inline void* Thread::entryPoint(void* userdata)
 }
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class Thread
+/// \ingroup shared
+///
+/// You can create a thread in two ways: using the constructor, or by calling launch().
+/// The function argument can return anything, but the value returned will be ignored and, therefore, lost.
+///
+/// Usage examples:
+/// \li Non-member function
+/// \code
+///     float f()
+///     {
+///         // ...
+///         return 2.5f;
+///     }
+///
+///     Thread t1(&f);
+///
+///     // or
+///
+///     Thread t2;
+///     t2.launch(&f);
+/// \endcode
+///
+/// \li Member function
+/// \code
+///     class C
+///     {
+///     public:
+///         void f(int x, double y, char* s)
+///         {
+///             // ...
+///         }
+///     };
+///
+///     C obj;
+///     char s[20];
+///
+///     Thread().launch(&C::f, obj, 25, 1.0, s).detach();
+///
+///     // or
+///
+///     Thread t2;
+///     t2.launch(&C::f, &obj, 0, 0.0, s + 3);
+/// \endcode
+///
+/// \li Functor
+/// \code
+///     class Functor
+///     {
+///     public:
+///         void operator() (int x)
+///         {
+///             // ...
+///         }
+///     };
+///
+///     Thread t1(Functor(), 25);
+///
+///     // or
+///
+///     Functor obj;
+///     Thread t2;
+///     t2.launch(obj, 0);
+/// \endcode
+///
+/// \li Lambda
+/// \code
+///     Thread t1([] {std::cout << "t1\n";});
+///
+///     // or
+///
+///     Thread t2;
+///     t2.launch([](int x) {std::cout << "t2 " << x << '\n'}, 0);
+/// \endcode
+////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 #include <exception>
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief A class used for synchronizing threads.
+/// \brief A class used for blocking concurrent access to a shared resource.
 ////////////////////////////////////////////////////////////////////////////////
 class Mutex
 {
@@ -50,6 +50,8 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Destructor.
+    /// \warning If the object goes out of scope while the mutex is still locked
+    ///          then the behaviour is undefined.
     ////////////////////////////////////////////////////////////////////////////////
     ~Mutex();
 
@@ -60,8 +62,7 @@ public:
     /// \details If the mutex is already locked then the thread blocks until it
     ///          becomes unlocked. Attempting to lock a mutex twice in the same
     ///          thread causes undefined behaviour. If an error occurs then
-    ///          LockError is thrown. For a non-blocking alternative see trylock.
-    /// \sa trylock unlock
+    ///          LockError is thrown. For a non-blocking alternative see trylock().
     ////////////////////////////////////////////////////////////////////////////////
     void lock();
 
@@ -71,7 +72,6 @@ public:
     ///          behaviour. Attempting to unlock a mutex locked by another thread
     ///          causes undefined behaviour. If an error occurs then UnlockError is
     ///          thrown.
-    /// \sa lock trylock
     ////////////////////////////////////////////////////////////////////////////////
     void unlock();
 
@@ -80,9 +80,8 @@ public:
     /// \details Like lock, but return immediately without blocking. If the mutex is
     ///          unlocked then this method locks it and returns true. Otherwise, it
     ///          returns false. If an error occurs then TryLockError is thrown. For
-    ///          a blocking alternative see lock.
+    ///          a blocking alternative see lock().
     /// \return True if locking was successfully. False otherwise
-    /// \sa lock unlock
     ////////////////////////////////////////////////////////////////////////////////
     bool trylock();
 
@@ -141,3 +140,38 @@ inline bool Mutex::trylock()
     throw LockError("Could not lock mutex", error);
 }
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class Mutex
+/// \ingroup shared
+///
+/// If the function in which a mutex is locked might throw an exception or has multiple exit points then you should use the class Lock.
+/// This class does not implement recursive mutexes, therefore locking a mutex twice in the same thread causes undefined behaviour.
+///
+/// Usage example:
+/// \code
+///     int shared_resource = 13;
+///     Mutex mutex;
+///
+///     void thread1()
+///     {
+///         mutex.lock();
+///         shared_resource = 42;
+///         mutex.unlock();
+///     }
+///
+///     void thread2()
+///     {
+///         mutex.lock();
+///         if(shared_resource == 42)
+///             shared_resource = 5;
+///         mutex.unlock();
+///     }
+/// \endcode
+///
+/// \sa Lock
+////////////////////////////////////////////////////////////////////////////////

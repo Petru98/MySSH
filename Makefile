@@ -15,13 +15,15 @@ export SERVERDIR := server
 export CLIENTDIR := client
 export SHAREDDIR := shared
 
+DOCDIR := doc
+
 
 
 ################################################################
 ######################## Build targets #########################
 ################################################################
 # Build all
-all: $(BINS)
+all: $(BINS) $(DOCDIR)
 
 # Build binary files
 $(SERVERNAME): $(SERVERDIR)/$(SERVERNAME)
@@ -40,10 +42,18 @@ $(CLIENTDIR)/$(CLIENTNAME): $(SHAREDDIR)
 $(SHAREDDIR):
 	@$(MAKE) -C $(SHAREDDIR)
 
+# Build documentation
+$(DOCDIR): Doxyfile \
+     $(wildcard $(SERVERDIR)/include/*.hpp) $(wildcard $(SERVERDIR)/include/*.h) \
+     $(wildcard $(CLIENTDIR)/include/*.hpp) $(wildcard $(CLIENTDIR)/include/*.h) \
+     $(wildcard $(SHAREDDIR)/include/*.hpp) $(wildcard $(SHAREDDIR)/include/*.h)
+	@$(RM) -r $(DOCDIR) \
+	;doxygen Doxyfile
+
 
 
 # Clean intermediary files only
-clean: clean-server clean-client clean-shared
+clean: clean-server clean-client clean-shared clean-doc
 
 clean-server:
 	@$(RM) $(SERVERNAME) \
@@ -55,6 +65,9 @@ clean-client:
 
 clean-shared:
 	@$(MAKE) -C $(SHAREDDIR) clean
+
+clean-doc:
+	@$(RM) -r $(DOCDIR)
 
 
 
@@ -68,4 +81,4 @@ print-%:
 ############################ Others ############################
 ################################################################
 # These targets are not files or directories
-.PHONY: all clean clean-server clean-client clean-shared print-% $(SHAREDDIR)
+.PHONY: all clean clean-server clean-client clean-shared clean-doc print-% $(SHAREDDIR)
