@@ -55,7 +55,8 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(shell $(MAKE) -s -C $(SHAREDDIR) print-OBJDIR)
-    SHAREDOBJS   := # $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep )
+    SHAREDOBJS   := tinyxml2
+    SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
 

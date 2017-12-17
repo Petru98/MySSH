@@ -28,18 +28,6 @@ private:
     Mutex& mutex; ///< Mutex
 };
 
-
-
-
-
-inline Lock::Lock(Mutex& mutex) : mutex(mutex)
-{
-    this->mutex.lock();
-}
-inline Lock::~Lock()
-{
-    this->mutex.unlock();
-}
 #endif
 
 

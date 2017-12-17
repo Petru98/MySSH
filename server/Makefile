@@ -54,7 +54,8 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep tinyxml2)
+    SHAREDOBJS   := tinyxml2 Thread Mutex Lock
+    SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
 

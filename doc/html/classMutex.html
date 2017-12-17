@@ -120,9 +120,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Mutex::Mutex </td>
@@ -131,17 +128,10 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Default constructor. </p>
 <p>If creation of the mutex fails then <a class="el" href="structMutex_1_1CreateError.html" title="Exception thrown when creation fails. ">CreateError</a> is thrown. </p>
-
-<p class="definition">Definition at line <a class="el" href="Mutex_8hpp_source.html#l00099">99</a> of file <a class="el" href="Mutex_8hpp_source.html">Mutex.hpp</a>.</p>
 
 </div>
 </div>
@@ -150,9 +140,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">Mutex::~Mutex </td>
@@ -161,17 +148,10 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Destructor. </p>
 <dl class="section warning"><dt>Warning</dt><dd>If the object goes out of scope while the mutex is still locked then the behaviour is undefined. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="Mutex_8hpp_source.html#l00107">107</a> of file <a class="el" href="Mutex_8hpp_source.html">Mutex.hpp</a>.</p>
 
 </div>
 </div>
@@ -181,9 +161,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Mutex::lock </td>
@@ -192,17 +169,10 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p><a class="el" href="classLock.html" title="Wrapper for locking and unlocking mutexes automatically. ">Lock</a> the mutex. </p>
 <p>If the mutex is already locked then the thread blocks until it becomes unlocked. Attempting to lock a mutex twice in the same thread causes undefined behaviour. If an error occurs then <a class="el" href="structMutex_1_1LockError.html" title="Exception thrown when locking fails. ">LockError</a> is thrown. For a non-blocking alternative see <a class="el" href="classMutex.html#a2975f84f1804e5167d674c25aa18d087" title="Try locking the mutex. ">trylock()</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="Mutex_8hpp_source.html#l00115">115</a> of file <a class="el" href="Mutex_8hpp_source.html">Mutex.hpp</a>.</p>
 
 </div>
 </div>
@@ -211,9 +181,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">void Mutex::unlock </td>
@@ -222,17 +189,10 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Unlock the mutex. </p>
 <p>Attempting to unlock an already unlocked mutex causes undefined behaviour. Attempting to unlock a mutex locked by another thread causes undefined behaviour. If an error occurs then <a class="el" href="structMutex_1_1UnlockError.html" title="Exception thrown when unlocking fails. ">UnlockError</a> is thrown. </p>
-
-<p class="definition">Definition at line <a class="el" href="Mutex_8hpp_source.html#l00123">123</a> of file <a class="el" href="Mutex_8hpp_source.html">Mutex.hpp</a>.</p>
 
 </div>
 </div>
@@ -241,9 +201,6 @@ Public Member Functions</h2></td></tr>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">bool Mutex::trylock </td>
@@ -252,17 +209,10 @@ Public Member Functions</h2></td></tr>
           <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Try locking the mutex. </p>
 <p>Like lock, but return immediately without blocking. If the mutex is unlocked then this method locks it and returns true. Otherwise, it returns false. If an error occurs then <a class="el" href="structMutex_1_1TryLockError.html" title="Exception thrown when try-locking fails. ">TryLockError</a> is thrown. For a blocking alternative see <a class="el" href="classMutex.html#ad91be808bf0a60a16f10b897ec246d3a" title="Lock the mutex. ">lock()</a>. </p><dl class="section return"><dt>Returns</dt><dd>True if locking was successfully. False otherwise </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="Mutex_8hpp_source.html#l00131">131</a> of file <a class="el" href="Mutex_8hpp_source.html">Mutex.hpp</a>.</p>
 
 </div>
 </div>
