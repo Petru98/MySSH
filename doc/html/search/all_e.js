@@ -2,11 +2,13 @@ var searchData=
 [
   ['parent',['Parent',['../classtinyxml2_1_1XMLNode.html#ae0f62bc186c56c2e0483ebd52dbfbe34',1,'tinyxml2::XMLNode']]],
   ['parse',['Parse',['../classtinyxml2_1_1XMLDocument.html#a1819bd34f540a7304c105a6232d25a1f',1,'tinyxml2::XMLDocument']]],
+  ['pgpsocket',['PgpSocket',['../classPgpSocket.html',1,'']]],
   ['previoussibling',['PreviousSibling',['../classtinyxml2_1_1XMLNode.html#aac667c513d445f8b783e1e15ef9d3551',1,'tinyxml2::XMLNode::PreviousSibling()'],['../classtinyxml2_1_1XMLHandle.html#a428374e756f4db4cbc287fec64eae02c',1,'tinyxml2::XMLHandle::PreviousSibling()']]],
   ['previoussiblingelement',['PreviousSiblingElement',['../classtinyxml2_1_1XMLNode.html#a872936cae46fb473eb47fec99129fc70',1,'tinyxml2::XMLNode::PreviousSiblingElement()'],['../classtinyxml2_1_1XMLHandle.html#a786957e498039554ed334cdc36612a7e',1,'tinyxml2::XMLHandle::PreviousSiblingElement()']]],
   ['print',['Print',['../classtinyxml2_1_1XMLDocument.html#a867cf5fa3e3ff6ae4847a8b7ee8ec083',1,'tinyxml2::XMLDocument']]],
   ['printerror',['PrintError',['../classtinyxml2_1_1XMLDocument.html#a1d033945b42e125d933d6231e4571552',1,'tinyxml2::XMLDocument']]],
   ['printspace',['PrintSpace',['../classtinyxml2_1_1XMLPrinter.html#a01148e2ebe6776e38c5a3e41bc5feb74',1,'tinyxml2::XMLPrinter']]],
+  ['protocols',['Protocols',['../classSocket.html#a887cb6a692f34384c95410113fbf47e3',1,'Socket']]],
   ['pushattribute',['PushAttribute',['../classtinyxml2_1_1XMLPrinter.html#a9a4e2c9348b42e147629d5a99f4af3f0',1,'tinyxml2::XMLPrinter']]],
   ['pushcomment',['PushComment',['../classtinyxml2_1_1XMLPrinter.html#afc8416814219591c2fd5656e0c233140',1,'tinyxml2::XMLPrinter']]],
   ['pushheader',['PushHeader',['../classtinyxml2_1_1XMLPrinter.html#a178c608ce8476043d5d6513819cde903',1,'tinyxml2::XMLPrinter']]],

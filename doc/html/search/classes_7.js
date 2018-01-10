@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['strpair',['StrPair',['../classtinyxml2_1_1StrPair.html',1,'tinyxml2']]]
+  ['joinerror',['JoinError',['../structThread_1_1JoinError.html',1,'Thread']]]
 ];

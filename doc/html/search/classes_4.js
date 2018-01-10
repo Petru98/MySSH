@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['joinerror',['JoinError',['../structThread_1_1JoinError.html',1,'Thread']]]
+  ['error',['Error',['../classIpAddress_1_1Error.html',1,'IpAddress::Error'],['../structThread_1_1Error.html',1,'Thread::Error'],['../structMutex_1_1Error.html',1,'Mutex::Error'],['../classSocket_1_1Error.html',1,'Socket::Error']]]
 ];

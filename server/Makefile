@@ -26,22 +26,25 @@ else
     TARGET := build
 endif
 
+ifneq ( , $(findstring debug,$(MAKECMDGOALS)))
+    TARGETMODE := debug
+else
+    TARGETMODE := release
+endif
+
 
 
 # Root directories for object/dependency files
 OBJDIR := .obj
 DEPDIR := .d
 
-# Final binary files directories
-BINS := $(NAME)
-
 
 
 ifneq (clean,$(TARGET))
     # C/C++ compiler, linker and assembler
     CC  := gcc
-    CXX := g++
-    LD  := g++
+    CXX := g++-7.2.0
+    LD  := g++-7.2.0
 
 
 
@@ -54,7 +57,7 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := tinyxml2 Thread Mutex Lock
+    SHAREDOBJS   := tinyxml2 Thread Mutex Lock PgpSocket Socket IpAddress
     SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
@@ -64,13 +67,19 @@ ifneq (clean,$(TARGET))
     INCDIR := include $(SHAREDINCDIR)
     LIBDIR := lib
 
+	# Target directories for object/dependency files
+	ifeq (build,$(TARGET))
+        OBJDIR := $(OBJDIR)/$(TARGETMODE)
+        DEPDIR := $(DEPDIR)/$(TARGETMODE)
+    endif
+
 
 
     # Full paths to source files & libraries
     SRCS := $(shell find $(SRCDIR) -type f -name "*.cpp") \
             $(shell find $(SRCDIR) -type f -name "*.c")
 
-    LIBS := pthread
+    LIBS := pthread crypto++
 
     # Full paths to object/dependency files
     OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.cpp.o,$(filter %.cpp,$(SRCS))) \
@@ -83,7 +92,7 @@ ifneq (clean,$(TARGET))
 
     # Preprocessor/C/C++/Linker flags
     CPPFLAGS := -DNDEBUG
-    CFLAGS   := -Wall -Wextra -O3
+    CFLAGS   := -Wall -Wextra
     CXXFLAGS := -std=c++17
     LDFLAGS  :=
 
@@ -112,10 +121,26 @@ endif
 ######################## Build targets #########################
 ################################################################
 # Build all
-all: $(BINS)
+all: release
+
+release: $(NAME)
+debug: $(NAME)-d
+
+
 
 # Build binary files
+$(NAME): CFLAGS += -O3
+$(NAME): CXXFLAGS += -O3
+
 $(NAME): $(OBJS)
+	@echo "Linking"     \
+	;$(MKDIR) $(dir $@) \
+	;$(LD) $(LDFLAGS) -o $@ $^ $(SHAREDOBJS) $(LDLIBS)
+
+$(NAME)-d: CFLAGS += -ggdb
+$(NAME)-d: CXXFLAGS += -ggdb
+
+$(NAME)-d: $(OBJS)
 	@echo "Linking"     \
 	;$(MKDIR) $(dir $@) \
 	;$(LD) $(LDFLAGS) -o $@ $^ $(SHAREDOBJS) $(LDLIBS)
@@ -176,7 +201,11 @@ print-%:
 
 # Clean intermediary files only
 clean:
-	@$(RM) -r $(OBJDIR) $(DEPDIR) $(BINS)
+	@$(RM) -r $(OBJDIR) $(DEPDIR) $(NAME) $(NAME)-d
+clean-release:
+	@$(RM) -r $(OBJDIR)/release $(DEPDIR)/release $(NAME)
+clean-debug:
+	@$(RM) -r $(OBJDIR)/debug $(DEPDIR)/debug $(NAME)-d
 
 
 
@@ -187,7 +216,7 @@ clean:
 .PRECIOUS: %.d
 
 # The next targets are not files
-.PHONY: all clean print-%
+.PHONY: all release debug clean clean-release clean-debug print-%
 
 # Include dependecies
 ifeq (build,$(TARGET))
