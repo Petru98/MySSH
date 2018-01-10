@@ -9,7 +9,7 @@ var searchData=
   ['connect',['connect',['../classSocket.html#acb088ecbe0f31a4a52bf4aee549afc61',1,'Socket']]],
   ['connecterror',['ConnectError',['../classSocket_1_1ConnectError.html',1,'Socket']]],
   ['create',['create',['../classSocket.html#a79d2e7d928415e5822dbb956b2144a62',1,'Socket']]],
-  ['createerror',['CreateError',['../classSocket_1_1CreateError.html',1,'Socket::CreateError'],['../structMutex_1_1CreateError.html',1,'Mutex::CreateError'],['../structThread_1_1CreateError.html',1,'Thread::CreateError']]],
+  ['createerror',['CreateError',['../structMutex_1_1CreateError.html',1,'Mutex::CreateError'],['../classSocket_1_1CreateError.html',1,'Socket::CreateError'],['../structThread_1_1CreateError.html',1,'Thread::CreateError']]],
   ['cstr',['CStr',['../classtinyxml2_1_1XMLPrinter.html#a180671d73844f159f2d4aafbc11d106e',1,'tinyxml2::XMLPrinter']]],
   ['cstrsize',['CStrSize',['../classtinyxml2_1_1XMLPrinter.html#a3256cf3523d4898b91abb18b924be04c',1,'tinyxml2::XMLPrinter']]]
 ];

@@ -2,7 +2,7 @@
 
 
 
-const IpAddress::IpAddress Any("0.0.0.0");
+const IpAddress IpAddress::Any(ntohl(INADDR_ANY));
 
 
 
@@ -28,6 +28,7 @@ IpAddress::IpAddress(uint32_t address)
 IpAddress& IpAddress::operator= (const IpAddress& that)
 {
     this->address.s_addr = that.address.s_addr;
+    return (*this);
 }
 IpAddress& IpAddress::operator= (const std::string& address)
 {
@@ -35,7 +36,7 @@ IpAddress& IpAddress::operator= (const std::string& address)
 
     if(inet_aton(address.c_str(), &this->address) == 0) // Try converting it and if it is not an IP address (zero returned) then interpret it as a host name
     {
-        addrinfo hints = {0};
+        addrinfo hints = {};
         hints.ai_family = AF_INET;
         addrinfo* result = nullptr;
 

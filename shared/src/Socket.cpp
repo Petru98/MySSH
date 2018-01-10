@@ -1,11 +1,11 @@
 #include <Socket.hpp>
 #include <unistd.h>
 
-Socket::Socket() : family(INet), sock(-1)
+Socket::Socket() : sock(-1), family(INet)
 {}
-Socket::Socket(Socket&& that) : family(that.family), sock(that.sock)
+Socket::Socket(Socket&& that) : sock(that.sock), family(that.family)
 {}
-Socket::Socket(int sock, int family) : family(family), sock(sock)
+Socket::Socket(int sock, int family) : sock(sock), family(family)
 {}
 Socket::Socket(Protocols protocol, int family, int flags) : Socket()
 {
@@ -44,7 +44,7 @@ bool Socket::isValid() const
 
 void Socket::bind(uint16_t port, IpAddress address)
 {
-    sockaddr_in addr = {0};
+    sockaddr_in addr = {};
     addr.sin_family = this->family;
     addr.sin_addr.s_addr = htonl(address.toInt());
     addr.sin_port = htons(port);
@@ -79,7 +79,7 @@ bool Socket::accept(IpAddress& address, uint16_t& port, Socket& sock)
 }
 bool Socket::connect(IpAddress address, uint16_t port)
 {
-    sockaddr_in addr = {0};
+    sockaddr_in addr = {};
     addr.sin_family = this->family;
     addr.sin_addr.s_addr = htonl(address.toInt());
     addr.sin_port = htons(port);

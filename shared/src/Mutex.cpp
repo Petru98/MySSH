@@ -1,7 +1,7 @@
 #include <Mutex.hpp>
 
 // https://linux.die.net/man/3/pthread_mutex_init
-inline Mutex::Mutex()
+Mutex::Mutex()
 {
     const int error = pthread_mutex_init(&this->mutex, nullptr);
     if(error != 0)
@@ -9,7 +9,7 @@ inline Mutex::Mutex()
 }
 
 // https://linux.die.net/man/3/pthread_mutex_destroy
-inline Mutex::~Mutex()
+Mutex::~Mutex()
 {
     pthread_mutex_destroy(&this->mutex);
 }
@@ -17,7 +17,7 @@ inline Mutex::~Mutex()
 
 
 // https://linux.die.net/man/3/pthread_mutex_lock
-inline void Mutex::lock()
+void Mutex::lock()
 {
     const int error = pthread_mutex_lock(&this->mutex);
     if(error != 0)
@@ -25,7 +25,7 @@ inline void Mutex::lock()
 }
 
 // https://linux.die.net/man/3/pthread_mutex_unlock
-inline void Mutex::unlock()
+void Mutex::unlock()
 {
     const int error = pthread_mutex_unlock(&this->mutex);
     if(error != 0)
@@ -33,7 +33,7 @@ inline void Mutex::unlock()
 }
 
 // https://linux.die.net/man/3/pthread_mutex_trylock
-inline bool Mutex::trylock()
+bool Mutex::trylock()
 {
     const int error = pthread_mutex_trylock(&this->mutex);
 

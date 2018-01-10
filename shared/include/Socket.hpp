@@ -233,7 +233,7 @@ protected:
     /// \param size Size of data
     /// \return Data after processing, which is the actual data sent
     ////////////////////////////////////////////////////////////////////////////////
-    virtual const void* onSend(const uint8_t* data, std::size_t& size) {return data;}
+    virtual const void* onSend(const uint8_t* data, std::size_t& size) {return data; ((void)size);}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Method called after receiving data.
@@ -245,7 +245,7 @@ protected:
     /// \param data Pointer to data received
     /// \param size Size of data received
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void onReceive(uint8_t* data, std::size_t& size) {}
+    virtual void onReceive(uint8_t* data, std::size_t& size) {((void)data); ((void)size);}
 
 
 
