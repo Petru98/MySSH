@@ -106,6 +106,9 @@ public:
 
 
 
+    ///
+    bool isAlive() const;
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Check if thread is joinable.
     /// \details A thread is joinable if it exists, is not detached and does not
@@ -144,6 +147,41 @@ private:
     pthread_t thread; ///< Thread id
     bool joinable;    ///< True if the thread is joinable
 };
+
+
+
+
+
+template <typename F, typename... Args>
+Thread::Thread(F func, Args&&... args) : Thread()
+{
+    this->launch(std::forward<F>(func), std::forward<Args>(args)...);
+}
+
+// https://linux.die.net/man/3/pthread_create
+template <typename F, typename... Args>
+Thread& Thread::launch(F func, Args&&... args)
+{
+    if(this->isJoinable())
+        throw InvalThreadError("Thread object already owns a thread");
+
+    auto thread_proc = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
+    const int error = pthread_create(&this->thread, nullptr, Thread::entryPoint<decltype(thread_proc)>, &thread_proc);
+    if(error != 0)
+        throw CreateError("Could not create thread", error);
+
+    this->joinable = true;
+    return (*this);
+}
+
+// https://stackoverflow.com/questions/9306014/pthread-create-template-function-static-casting-a-template-class
+template <typename Callable>
+void* Thread::entryPoint(void* userdata)
+{
+    Callable procedure = std::move(*reinterpret_cast<Callable*>(userdata));
+    procedure();
+    return nullptr;
+}
 
 #endif
 

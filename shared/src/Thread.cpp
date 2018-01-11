@@ -1,4 +1,5 @@
 #include <Thread.hpp>
+#include <csignal>
 
 Thread::Thread() : thread(), joinable(false)
 {}
@@ -8,34 +9,11 @@ Thread::Thread(Thread&& that) : thread(that.thread), joinable(that.joinable)
     that.joinable = false;
 }
 
-template <typename F, typename... Args>
-Thread::Thread(F func, Args&&... args) : Thread()
-{
-    this->launch(std::forward<F>(func), std::forward<Args>(args)...);
-}
-
 Thread::~Thread()
 {
     this->join();
 }
 
-
-
-// https://linux.die.net/man/3/pthread_create
-template <typename F, typename... Args>
-Thread& Thread::launch(F func, Args&&... args)
-{
-    if(this->isJoinable())
-        throw InvalThreadError("Thread object already owns a thread");
-
-    auto thread_proc = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
-    const int error = pthread_create(&this->thread, nullptr, Thread::entryPoint<decltype(thread_proc)>, &thread_proc);
-    if(error != 0)
-        throw CreateError("Could not create thread", error);
-
-    this->joinable = true;
-    return (*this);
-}
 
 
 // https://linux.die.net/man/3/pthread_detach
@@ -66,6 +44,19 @@ void Thread::join()
 
 
 
+// http://man7.org/linux/man-pages/man3/pthread_kill.3.html
+bool Thread::isAlive() const
+{
+    if(this->isJoinable())
+    {
+        if(pthread_kill(this->thread, 0) == -1)
+            return errno == ESRCH;
+        return true;
+    }
+
+    return false;
+}
+
 bool Thread::isJoinable() const
 {
     return (this->joinable == true) && (this->thread != Thread::selfId());
@@ -84,15 +75,4 @@ pthread_t Thread::getId() const
 pthread_t Thread::selfId()
 {
     return pthread_self();
-}
-
-
-
-// https://stackoverflow.com/questions/9306014/pthread-create-template-function-static-casting-a-template-class
-template <typename Callable>
-void* Thread::entryPoint(void* userdata)
-{
-    Callable procedure = std::move(*reinterpret_cast<Callable*>(userdata));
-    procedure();
-    return nullptr;
 }

@@ -17,10 +17,14 @@ public:
 
 private:
     void init(int argc, char** argv);
+    void loopClients();
+    void loopInterface();
     void free();
 
     void initializeOptions();
     void parse(int argc, char** argv);
+
+    static void handleClient(std::size_t index);
 
 
 
@@ -30,9 +34,9 @@ private:
 
     Socket listener;
 
-    std::vector<Thread> handlers;
-    std::vector<Client> clients;
-    Mutex clients_mutex;
+    std::vector<Thread*> handlers;
+    std::vector<Client*> clients;
+    Mutex mutex;
 };
 
 #endif

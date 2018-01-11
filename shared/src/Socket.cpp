@@ -4,7 +4,9 @@
 Socket::Socket() : sock(-1), family(INet)
 {}
 Socket::Socket(Socket&& that) : sock(that.sock), family(that.family)
-{}
+{
+    that.sock = -1;
+}
 Socket::Socket(int sock, int family) : sock(sock), family(family)
 {}
 Socket::Socket(Protocols protocol, int family, int flags) : Socket()
