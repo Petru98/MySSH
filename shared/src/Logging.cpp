@@ -1,9 +1,20 @@
 #include <Logging.hpp>
+#include <Mutex.hpp>
+#include <Lock.hpp>
 #include <cstdio>
 #include <cstdarg>
 
+
+namespace
+{
+    Mutex stdout_logging_mutex;
+}
+
+
+
 void error(const char* fmt, ...)
 {
+    Lock lock(stdout_logging_mutex);
     va_list va;
     va_start(va, fmt);
 
@@ -16,6 +27,7 @@ void error(const char* fmt, ...)
 }
 void warning(const char* fmt, ...)
 {
+    Lock lock(stdout_logging_mutex);
     va_list va;
     va_start(va, fmt);
 
@@ -28,6 +40,7 @@ void warning(const char* fmt, ...)
 }
 void info(const char* fmt, ...)
 {
+    Lock lock(stdout_logging_mutex);
     va_list va;
     va_start(va, fmt);
 

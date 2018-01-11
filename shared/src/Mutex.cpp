@@ -8,6 +8,11 @@ Mutex::Mutex()
         throw CreateError("Could not create mutex", error);
 }
 
+Mutex::Mutex(const Mutex& that) : Mutex()
+{
+    ((void)that);
+}
+
 // https://linux.die.net/man/3/pthread_mutex_destroy
 Mutex::~Mutex()
 {

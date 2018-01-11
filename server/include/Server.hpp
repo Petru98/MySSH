@@ -3,6 +3,7 @@
 
 #include <Client.hpp>
 #include <CommandLine.hpp>
+#include <Thread.hpp>
 #include <tinyxml2.h>
 #include <vector>
 
@@ -12,11 +13,12 @@ public:
     Server();
     ~Server();
 
-    void init(int argc, char** argv);
-    void run();
-    void free();
+    void run(int argc, char** argv);
 
 private:
+    void init(int argc, char** argv);
+    void free();
+
     void initializeOptions();
     void parse(int argc, char** argv);
 
@@ -28,6 +30,7 @@ private:
 
     Socket listener;
 
+    std::vector<Thread> handlers;
     std::vector<Client> clients;
     Mutex clients_mutex;
 };

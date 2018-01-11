@@ -57,7 +57,7 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := tinyxml2 Thread Mutex Lock PgpSocket Socket IpAddress CommandLine Logging
+    SHAREDOBJS   := tinyxml2 PgpSocket Socket IpAddress CommandLine Logging Lock Mutex Thread
     SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
@@ -93,7 +93,7 @@ ifneq (clean,$(TARGET))
     # Preprocessor/C/C++/Linker flags
     CPPFLAGS := -DNDEBUG
     CFLAGS   := -Wall -Wextra
-    CXXFLAGS := -std=c++17
+    CXXFLAGS := -std=c++14
     LDFLAGS  :=
 
     CPPFLAGS += $(addprefix -I,$(INCDIR))

@@ -1,4 +1,5 @@
 #include <Server.hpp>
+#include <Lock.hpp>
 #include <stdexcept>
 
 Server::Server()
@@ -17,14 +18,20 @@ void Server::init(int argc, char** argv)
         throw std::runtime_error("Invalid users database XML file");
 }
 
-void Server::run()
-{
 
+
+void Server::run(int argc, char** argv)
+{
+    this->init(argc, argv);
+    this->free();
 }
+
+
 
 void Server::free()
 {
-
+    Lock lock(this->clients_mutex);
+    this->clients.clear();
 }
 
 

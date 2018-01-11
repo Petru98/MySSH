@@ -2,12 +2,12 @@
 
 
 
-inline Lock::Lock(Mutex& mutex) : mutex(mutex)
+Lock::Lock(Mutex& mutex) : mutex(mutex)
 {
     this->mutex.lock();
 }
 
-inline Lock::~Lock()
+Lock::~Lock()
 {
     this->mutex.unlock();
 }

@@ -8,9 +8,7 @@ int main(int argc, char** argv)
 
     try
     {
-        server.init(argc, argv);
-        server.run();
-        server.free();
+        server.run(argc, argv);
     }
     catch(std::exception& e)
     {
