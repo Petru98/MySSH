@@ -131,41 +131,11 @@ void Server::parseArgs(int argc, char** argv)
 void Server::handleClient(std::size_t index)
 {
     Client& client = (*this->clients[index]);
-
-    std::string buffer;
-    std::size_t size;
-
-    // TODO: Public key exchange
-
-    // Username
-    size = client.sock.recvString(buffer);
-
-    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
-    if(users == nullptr)
-        client.sock.send8(0);
-
-    tinyxml2::XMLElement* user_info = users->FirstChildElement("user");
-    while(user_info != nullptr && strcmp(user_info->FirstChildElement("name")->GetText(), buffer.c_str()) != 0)
-        user_info = user_info->NextSiblingElement("user");
-
-    if(user_info == nullptr)
-        client.sock.send8(0);
-
-    client.sock.send8(1);
-
-    // Password
-    size = client.sock.recvString(buffer);
-
-    const char* dbpasshash = user_info->FirstChildElement(buffer.c_str())->GetText();
-    char* recvpasshash[Sha512::DIGEST_SIZE];
-    Sha512(buffer.c_str(), size).finish(recvpasshash);
-
-    if(memcmp(dbpasshash, recvpasshash, Sha512::DIGEST_SIZE) != 0)
-        client.sock.send8(0);
-
-    client.sock.send8(1);
+    if(this->handleClientInit(client) == false)
+        return;
 
     // Loop
+    std::string buffer;
     bool must_exit = false;
 
     while(must_exit == false)
@@ -181,17 +151,9 @@ void Server::handleClient(std::size_t index)
             {
                 client.mutex.lock();
 
-                // Command from main thread
+                // Command from server thread
                 if(FD_ISSET(client.pipe.getReadFD(), &fdset))
-                {
-                    uint8_t code;
-                    client.pipe.read(&code, sizeof(code));
-
-                    switch(code)
-                    {
-                    case 0: must_exit = true; break;
-                    }
-                }
+                    must_exit = this->executeServerCommand(client) == false;
 
                 // Communication with the client
                 if(must_exit == true)
@@ -200,14 +162,11 @@ void Server::handleClient(std::size_t index)
                 }
                 else if(FD_ISSET(client.sock.getFD(), &fdset))
                 {
-                    size = client.sock.recvString(buffer);
+                    client.sock.recvString(buffer);
                     std::vector<std::string> cmd = this->parseClientCommand(buffer.c_str());
 
                     if(cmd.size() != 0)
-                    {
-                        must_exit = this->executeClientCommand(cmd);
-                    }
-
+                        must_exit = this->executeClientCommand(cmd) == false;
                     client.sock.send8(0);
                 }
 
@@ -219,6 +178,68 @@ void Server::handleClient(std::size_t index)
         catch(...)
         {}
     }
+}
+
+bool Server::handleClientInit(Client& client)
+{
+    Lock(client.mutex);
+
+    std::string buffer;
+    std::size_t size;
+
+    // TODO: Public key exchange
+
+    // Username
+    size = client.sock.recvString(buffer);
+
+    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
+    if(users == nullptr)
+    {
+        client.sock.send8(0);
+        return false;
+    }
+
+    tinyxml2::XMLElement* user_info = users->FirstChildElement("user");
+    while(user_info != nullptr && strcmp(user_info->FirstChildElement("name")->GetText(), buffer.c_str()) != 0)
+        user_info = user_info->NextSiblingElement("user");
+
+    if(user_info == nullptr)
+    {
+        client.sock.send8(0);
+        return false;
+    }
+
+    client.sock.send8(1);
+
+    // Password
+    size = client.sock.recvString(buffer);
+
+    const char* dbpasshash = user_info->FirstChildElement(buffer.c_str())->GetText();
+    char* recvpasshash[Sha512::DIGEST_SIZE];
+    Sha512(buffer.c_str(), size).finish(recvpasshash);
+
+    if(memcmp(dbpasshash, recvpasshash, Sha512::DIGEST_SIZE) != 0)
+    {
+        client.sock.send8(0);
+        return false;
+    }
+
+    client.sock.send8(1);
+    return true;
+}
+
+bool Server::executeServerCommand(Client& client)
+{
+
+    uint8_t code;
+    client.pipe.read(&code, sizeof(code));
+
+    switch(code)
+    {
+    case 0: return false;
+    }
+
+    return true;
 }
 
 std::vector<std::string> Server::parseClientCommand(const char* buffer)
@@ -258,6 +279,7 @@ std::vector<std::string> Server::parseClientCommand(const char* buffer)
 
     return std::move(argv);
 }
+
 bool Server::executeClientCommand(std::vector<std::string>& cmd)
 {
     if(cmd[0] == "exit")
