@@ -29,7 +29,7 @@ void error(const char* fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    puts("error: ");
+    printf("error: ");
     vprintf(fmt, va);
     putchar('\n');
     fflush(stdout);
@@ -42,7 +42,7 @@ void warning(const char* fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    puts("warning: ");
+    printf("warning: ");
     vprintf(fmt, va);
     putchar('\n');
     fflush(stdout);
@@ -55,7 +55,7 @@ void info(const char* fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    puts("info: ");
+    printf("info: ");
     vprintf(fmt, va);
     putchar('\n');
     fflush(stdout);

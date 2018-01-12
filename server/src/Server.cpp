@@ -2,6 +2,7 @@
 #include <Lock.hpp>
 #include <Sha512.hpp>
 #include <Logging.hpp>
+#include <memory.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
@@ -336,10 +337,12 @@ void Server::addUser(const std::string& name, const std::string& password)
 
 
     char password_hash[Sha512::DIGEST_SIZE];
+    char password_hash_hex[sizeof(password_hash) * 2 + 1];
     Sha512(password.c_str(), password.length()).finish(password_hash);
+    toHex(password_hash, password_hash_hex);
 
     user_name->SetText(name.c_str());
-    user_password->SetText(password_hash);
+    user_password->SetText(password_hash_hex);
     user->InsertEndChild(user_name);
     user->InsertEndChild(user_password);
     users->InsertEndChild(user);
