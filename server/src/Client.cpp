@@ -21,7 +21,8 @@ void Client::disconnect()
 
     if(this->sock.isValid())
     {
-        this->sock.close();
+        uint8_t code = 0;
+        this->pipe.write(&code, sizeof(code));
     }
 }
 

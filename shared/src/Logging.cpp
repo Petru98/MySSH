@@ -12,6 +12,17 @@ namespace
 
 
 
+void print(const char* fmt, ...)
+{
+    Lock lock(stdout_logging_mutex);
+    va_list va;
+    va_start(va, fmt);
+
+    vprintf(fmt, va);
+    fflush(stdout);
+
+    va_end(va);
+}
 void error(const char* fmt, ...)
 {
     Lock lock(stdout_logging_mutex);

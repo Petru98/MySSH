@@ -25,14 +25,16 @@ private:
 
     void initializeOptions();
     void parseArgs(int argc, char** argv);
+    std::vector<std::string> parseCommand(const char* buffer);
 
     void handleClient(std::size_t index);
     bool handleClientInit(Client& client);
 
     bool executeServerCommand(Client& client);
-
-    std::vector<std::string> parseClientCommand(const char* buffer);
     bool executeClientCommand(std::vector<std::string>& cmd);
+
+    void addUser(const std::string& name, const std::string& password);
+    tinyxml2::XMLElement* findUser(const char* name);
 
 
 

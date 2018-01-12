@@ -1,6 +1,7 @@
 #include <Server.hpp>
 #include <Lock.hpp>
 #include <Sha512.hpp>
+#include <Logging.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
@@ -32,9 +33,20 @@ void Server::run(int argc, char** argv)
 void Server::init(int argc, char** argv)
 {
     this->parseArgs(argc, argv);
-
     tinyxml2::XMLError xmlerr = this->database.LoadFile(this->options.findOption("database").c_str());
-    if(xmlerr != tinyxml2::XML_SUCCESS && xmlerr != tinyxml2::XML_ERROR_FILE_NOT_FOUND)
+
+    if(xmlerr == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
+    {
+        tinyxml2::XMLElement* users = this->database.NewElement("users");
+        if(users == nullptr)
+            throw std::runtime_error(this->database.ErrorStr());
+        if(this->database.InsertEndChild(users) == nullptr)
+        {
+            this->database.DeleteNode(users);
+            throw std::runtime_error(this->database.ErrorStr());
+        }
+    }
+    else if(xmlerr != tinyxml2::XML_SUCCESS)
         throw std::runtime_error(this->database.ErrorStr());
 
     int port = std::stoi(this->options.findOption("port"));
@@ -76,25 +88,33 @@ void Server::loopAcceptConn()
     }
 }
 
-
-
 void Server::loopInterface()
 {
-    std::string cmd;
+    std::string line_str;
     bool must_exit = false;
 
-    while(must_exit == false && std::getline(std::cin, cmd))
+    while(must_exit == false && std::getline(std::cin, line_str))
     {
-        if(cmd == "exit")
-            must_exit = true;
-        else
-        {
+        std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
 
+        if(cmd[0] == "exit")
+            must_exit = true;
+        else if(cmd[0] == "adduser")
+        {
+            if(cmd.size() - 1 != 2)
+                error("invalid number of arguments");
+            else
+            {
+                try
+                    {this->addUser(cmd[1], cmd[2]);}
+                catch(std::exception& e)
+                    {error(e.what());}
+            }
         }
+        else
+            error("unknown command");
     }
 }
-
-
 
 void Server::free()
 {
@@ -121,9 +141,47 @@ void Server::initializeOptions()
     this->options.addOption('d', "database", "db.xml");
     this->options.addOption('p', "port", "1100");
 }
+
 void Server::parseArgs(int argc, char** argv)
 {
     this->options.parse(argc, argv);
+}
+std::vector<std::string> Server::parseCommand(const char* buffer)
+{
+    constexpr char delims[] = " \t";
+    bool done = ((*buffer) == '\0');
+    std::vector<std::string> argv;
+
+    while(done == false)
+    {
+        while((*buffer) != '\0' && strchr(delims, *buffer) != nullptr)
+            ++buffer;
+
+        if((*buffer) == '\0')
+        {
+            done = true;
+        }
+        else
+        {
+            std::string str;
+            bool quotes_open = false;
+
+            while((*buffer) != '\0' && (quotes_open == true || strchr(delims, *buffer) == nullptr))
+            {
+                if((*buffer) == '\"')
+                    quotes_open = !quotes_open;
+
+                str.push_back(*buffer);
+                ++buffer;
+            }
+
+            done = ((*buffer) == '\0');
+            ++buffer;
+            argv.push_back(std::move(str));
+        }
+    }
+
+    return std::move(argv);
 }
 
 
@@ -163,7 +221,7 @@ void Server::handleClient(std::size_t index)
                 else if(FD_ISSET(client.sock.getFD(), &fdset))
                 {
                     client.sock.recvString(buffer);
-                    std::vector<std::string> cmd = this->parseClientCommand(buffer.c_str());
+                    std::vector<std::string> cmd = this->parseCommand(buffer.c_str());
 
                     if(cmd.size() != 0)
                         must_exit = this->executeClientCommand(cmd) == false;
@@ -178,6 +236,8 @@ void Server::handleClient(std::size_t index)
         catch(...)
         {}
     }
+
+    client.sock.close();
 }
 
 bool Server::handleClientInit(Client& client)
@@ -192,17 +252,7 @@ bool Server::handleClientInit(Client& client)
     // Username
     size = client.sock.recvString(buffer);
 
-    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
-    if(users == nullptr)
-    {
-        client.sock.send8(0);
-        return false;
-    }
-
-    tinyxml2::XMLElement* user_info = users->FirstChildElement("user");
-    while(user_info != nullptr && strcmp(user_info->FirstChildElement("name")->GetText(), buffer.c_str()) != 0)
-        user_info = user_info->NextSiblingElement("user");
-
+    tinyxml2::XMLElement* user_info = this->findUser(buffer.c_str());
     if(user_info == nullptr)
     {
         client.sock.send8(0);
@@ -242,48 +292,69 @@ bool Server::executeServerCommand(Client& client)
     return true;
 }
 
-std::vector<std::string> Server::parseClientCommand(const char* buffer)
-{
-    constexpr char delims[] = " \t";
-    bool done = ((*buffer) == '\0');
-    std::vector<std::string> argv;
-
-    while(done == false)
-    {
-        while((*buffer) != '\0' && strchr(delims, *buffer) != nullptr)
-            ++buffer;
-
-        if((*buffer) == '\0')
-        {
-            done = true;
-        }
-        else
-        {
-            std::string str;
-            bool quotes_open = false;
-
-            while((*buffer) != '\0' && (quotes_open == true || strchr(delims, *buffer) == nullptr))
-            {
-                if((*buffer) == '\"')
-                    quotes_open = !quotes_open;
-
-                str.push_back(*buffer);
-                ++buffer;
-            }
-
-            done = ((*buffer) == '\0');
-            ++buffer;
-            argv.push_back(std::move(str));
-        }
-    }
-
-    return std::move(argv);
-}
-
 bool Server::executeClientCommand(std::vector<std::string>& cmd)
 {
     if(cmd[0] == "exit")
         return false;
 
     return true;
+}
+
+
+
+
+
+void Server::addUser(const std::string& name, const std::string& password)
+{
+    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
+    assert(users != nullptr);
+
+
+    tinyxml2::XMLElement* user = this->findUser(name.c_str());
+    if(user != nullptr)
+        throw std::runtime_error("an user with the same name already exists");
+
+    user = this->database.NewElement("user");
+    if(user == nullptr)
+        throw std::runtime_error(this->database.ErrorStr());
+
+    tinyxml2::XMLElement* user_name = this->database.NewElement("name");
+    if(user_name == nullptr)
+    {
+        this->database.DeleteNode(user);
+        throw std::runtime_error(this->database.ErrorStr());
+    }
+
+    tinyxml2::XMLElement* user_password = this->database.NewElement("password");
+    if(user_password == nullptr)
+    {
+        this->database.DeleteNode(user);
+        this->database.DeleteNode(user_name);
+        throw std::runtime_error(this->database.ErrorStr());
+    }
+
+
+
+    char password_hash[Sha512::DIGEST_SIZE];
+    Sha512(password.c_str(), password.length()).finish(password_hash);
+
+    user_name->SetText(name.c_str());
+    user_password->SetText(password_hash);
+    user->InsertEndChild(user_name);
+    user->InsertEndChild(user_password);
+    users->InsertEndChild(user);
+
+    this->database.SaveFile(this->options.findOption("database").c_str());
+}
+
+tinyxml2::XMLElement* Server::findUser(const char* name)
+{
+    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
+    assert(users != nullptr);
+
+    tinyxml2::XMLElement* user = users->FirstChildElement("user");
+    while(user != nullptr && user->FirstChildElement("name") != nullptr && strcmp(user->FirstChildElement("name")->GetText(), name) != 0)
+        user = user->NextSiblingElement("user");
+
+    return user;
 }
