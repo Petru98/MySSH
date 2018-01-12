@@ -3,6 +3,9 @@
 
 #include <PgpSocket.hpp>
 #include <Mutex.hpp>
+#include <Pipe.hpp>
+
+
 
 class Client
 {
@@ -18,13 +21,11 @@ public:
     void disconnect();
     bool isConnected() const;
 
-    void send(const void* data, std::size_t size);
-    void recv(void* data, std::size_t size);
 
 
-
-private:
+public:
     Mutex mutex;
+    Pipe pipe;
     PgpSocket sock;
     IpAddress ip;
     uint16_t port;

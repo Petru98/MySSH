@@ -7,6 +7,8 @@
 #include <tinyxml2.h>
 #include <vector>
 
+
+
 class Server
 {
 public:
@@ -17,20 +19,20 @@ public:
 
 private:
     void init(int argc, char** argv);
-    void loopClients();
+    void loopAcceptConn();
     void loopInterface();
     void free();
 
     void initializeOptions();
-    void parse(int argc, char** argv);
+    void parseArgs(int argc, char** argv);
 
-    static void handleClient(std::size_t index);
+    void handleClient(std::size_t index);
 
 
 
 private:
     CommandLine options;
-    tinyxml2::XMLDocument users_db;
+    tinyxml2::XMLDocument database;
 
     Socket listener;
 
