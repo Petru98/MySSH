@@ -22,7 +22,7 @@ public:
     {
     public:
         CreateError() : Error(0), flags(0) {}
-        CreateError(int error, int flags) Error(error), flags(flags) {}
+        CreateError(int error, int flags) : Error(error), flags(flags) {}
 
         const char* what() {return "could not create pipe";}
 
@@ -34,7 +34,7 @@ public:
     {
     public:
         SetSizeError() : Error(0), size(0) {}
-        SetSizeError(int error, std::size_t size) Error(error), size(size) {}
+        SetSizeError(int error, std::size_t size) : Error(error), size(size) {}
 
         const char* what() {return "could not set pipe size";}
 

@@ -45,7 +45,11 @@ std::size_t Pipe::write(const void* buffer, std::size_t size)
 
 void Pipe::setSize(std::size_t size)
 {
-    int error = fcntl(this->fd, F_SETPIPE_SZ, static_cast<int>(size));
+    int error = fcntl(this->fd[0].getFD(), F_SETPIPE_SZ, static_cast<int>(size));
+    if(error == -1)
+        throw SetSizeError(errno, size);
+
+    error = fcntl(this->fd[1].getFD(), F_SETPIPE_SZ, static_cast<int>(size));
     if(error == -1)
         throw SetSizeError(errno, size);
 }

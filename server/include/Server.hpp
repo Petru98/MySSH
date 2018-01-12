@@ -27,6 +27,8 @@ private:
     void parseArgs(int argc, char** argv);
 
     void handleClient(std::size_t index);
+    std::vector<std::string> parseClientCommand(const char* buffer);
+    bool executeClientCommand(std::vector<std::string>& cmd);
 
 
 

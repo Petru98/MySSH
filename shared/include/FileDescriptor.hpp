@@ -56,6 +56,9 @@ public:
     std::size_t read(void* buffer, std::size_t size);
     std::size_t write(const void* buffer, std::size_t size);
 
+    void readAll(void* buffer, std::size_t size);
+    void writeAll(const void* buffer, std::size_t size);
+
 
 
 protected:

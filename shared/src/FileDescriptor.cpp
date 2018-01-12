@@ -47,3 +47,22 @@ std::size_t FileDescriptor::write(const void* buffer, std::size_t size)
 
     return static_cast<std::size_t>(written);
 }
+
+void FileDescriptor::readAll(void* buffer, std::size_t size)
+{
+    while(size > 0)
+    {
+        std::size_t read = this->read(buffer, size);
+        buffer = reinterpret_cast<uint8_t*>(buffer) + read;
+        size -= read;
+    }
+}
+void FileDescriptor::writeAll(const void* buffer, std::size_t size)
+{
+    while(size > 0)
+    {
+        std::size_t written = this->write(buffer, size);
+        buffer = reinterpret_cast<const uint8_t*>(buffer) + written;
+        size -= written;
+    }
+}

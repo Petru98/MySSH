@@ -11,7 +11,7 @@ Socket::Socket(Socket&& that) : FileDescriptor(that.fd), family(that.family)
 {
     that.fd = -1;
 }
-Socket::Socket(int sock, int family) : FileDescriptor(fd), family(family)
+Socket::Socket(int fd, int family) : FileDescriptor(fd), family(family)
 {}
 Socket::Socket(Protocols protocol, int family, int flags) : Socket()
 {
@@ -113,7 +113,7 @@ void Socket::sendSize(std::size_t data, int flags)
 
     while(data_remaining > 0)
     {
-        std::size_t sent = ::send(this->fd, &data_ptr, data_remaining, flags);
+        ssize_t sent = ::send(this->fd, &data_ptr, data_remaining, flags);
         if(sent == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
@@ -134,7 +134,7 @@ std::size_t Socket::recvSize(int flags)
 
     while(buffer_remaining > 0)
     {
-        std::size_t received = ::recv(this->fd, &buffer_ptr, buffer_remaining, flags);
+        ssize_t received = ::recv(this->fd, &buffer_ptr, buffer_remaining, flags);
         if(received == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
@@ -170,7 +170,7 @@ void Socket::send(const void* data, std::size_t size, int flags)
 
     while(size > 0)
     {
-        std::size_t sent = ::send(this->fd, it, size, flags);
+        ssize_t sent = ::send(this->fd, it, size, flags);
         if(sent == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
@@ -186,7 +186,7 @@ void Socket::send(const void* data, std::size_t size, int flags)
 std::size_t Socket::recv(void* buffer, std::size_t size, int flags)
 {
     if(buffer == nullptr || size == 0)
-        return;
+        return 0;
 
     // Receive the size of the content and packet
     const std::size_t size_content = this->recvSize();
