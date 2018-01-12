@@ -144,7 +144,10 @@ void Server::handleClient(std::size_t index)
     if(users == nullptr)
         client.sock.send8(0);
 
-    tinyxml2::XMLElement* user_info = users->FirstChildElement(buffer.c_str());
+    tinyxml2::XMLElement* user_info = users->FirstChildElement("user");
+    while(user_info != nullptr && strcmp(user_info->FirstChildElement("name")->GetText(), buffer.c_str()) != 0)
+        user_info = user_info->NextSiblingElement("user");
+
     if(user_info == nullptr)
         client.sock.send8(0);
 
