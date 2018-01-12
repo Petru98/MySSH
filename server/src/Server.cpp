@@ -265,8 +265,9 @@ bool Server::handleClientInit(Client& client)
     // Password
     size = client.sock.recvString(buffer);
 
-    const char* dbpasshash = user_info->FirstChildElement(buffer.c_str())->GetText();
-    char* recvpasshash[Sha512::DIGEST_SIZE];
+    char recvpasshash[Sha512::DIGEST_SIZE];
+    char dbpasshash[sizeof(recvpasshash)];
+    fromHex(user_info->FirstChildElement(buffer.c_str())->GetText(), dbpasshash);
     Sha512(buffer.c_str(), size).finish(recvpasshash);
 
     if(memcmp(dbpasshash, recvpasshash, Sha512::DIGEST_SIZE) != 0)

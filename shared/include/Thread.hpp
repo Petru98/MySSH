@@ -165,8 +165,8 @@ Thread& Thread::launch(F func, Args&&... args)
     if(this->isJoinable())
         throw InvalThreadError("Thread object already owns a thread");
 
-    auto thread_proc = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
-    const int error = pthread_create(&this->thread, nullptr, Thread::entryPoint<decltype(thread_proc)>, &thread_proc);
+    auto thread_proc = new std::function<void()>(std::bind(std::forward<F>(func), std::forward<Args>(args)...));
+    const int error = pthread_create(&this->thread, nullptr, Thread::entryPoint<std::remove_pointer<decltype(thread_proc)>::type>, thread_proc);
     if(error != 0)
         throw CreateError("Could not create thread", error);
 
@@ -178,8 +178,10 @@ Thread& Thread::launch(F func, Args&&... args)
 template <typename Callable>
 void* Thread::entryPoint(void* userdata)
 {
-    Callable procedure = std::move(*reinterpret_cast<Callable*>(userdata));
+    Callable* procedure_ptr = reinterpret_cast<Callable*>(userdata);
+    Callable procedure = std::move(*procedure_ptr);
     procedure();
+    delete procedure_ptr;
     return nullptr;
 }
 
