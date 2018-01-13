@@ -109,22 +109,25 @@ void Server::loopInterface()
     {
         std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
 
-        if(cmd[0] == "exit")
-            must_exit = true;
-        else if(cmd[0] == "adduser")
+        if(cmd.size() > 0)
         {
-            if(cmd.size() - 1 != 2)
-                error("invalid number of arguments");
-            else
+            if(cmd[0] == "exit")
+                must_exit = true;
+            else if(cmd[0] == "adduser")
             {
-                try
-                    {this->addUser(cmd[1], cmd[2]);}
-                catch(std::exception& e)
-                    {error(e.what());}
+                if(cmd.size() - 1 != 2)
+                    error("invalid number of arguments");
+                else
+                {
+                    try
+                        {this->addUser(cmd[1], cmd[2]);}
+                    catch(std::exception& e)
+                        {error(e.what());}
+                }
             }
+            else
+                error("unknown command");
         }
-        else
-            error("unknown command");
     }
 }
 
