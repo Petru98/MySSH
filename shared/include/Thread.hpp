@@ -82,7 +82,7 @@ public:
     /// \return Reference to the object the method was called on
     ////////////////////////////////////////////////////////////////////////////////
     template <typename F, typename... Args>
-    Thread& launch(F func, Args&&... args);
+    Thread& launch(F&& func, Args&&... args);
 
 
 
@@ -160,12 +160,12 @@ Thread::Thread(F func, Args&&... args) : Thread()
 
 // https://linux.die.net/man/3/pthread_create
 template <typename F, typename... Args>
-Thread& Thread::launch(F func, Args&&... args)
+Thread& Thread::launch(F&& func, Args&&... args)
 {
     if(this->isJoinable())
         throw InvalThreadError("Thread object already owns a thread");
 
-    auto thread_proc = new std::function<void()>(std::bind(std::forward<F>(func), std::forward<Args>(args)...));
+    auto thread_proc = new std::function<void()>(std::bind(std::forward<F&&>(func), std::forward<Args&&>(args)...));
     const int error = pthread_create(&this->thread, nullptr, Thread::entryPoint<std::remove_pointer<decltype(thread_proc)>::type>, thread_proc);
     if(error != 0)
         throw CreateError("Could not create thread", error);

@@ -18,6 +18,10 @@ public:
     void run(int argc, char** argv);
 
 private:
+    class ExitEvent {};
+
+
+
     void init(int argc, char** argv);
     void loopAcceptConn();
     void loopInterface();
@@ -31,7 +35,7 @@ private:
     bool handleClientInit(Client& client);
 
     bool executeServerCommand(Client& client);
-    bool executeClientCommand(std::vector<std::string>& cmd);
+    int executeClientCommand(const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
 
     void addUser(const std::string& name, const std::string& password);
     tinyxml2::XMLElement* findUser(const char* name);

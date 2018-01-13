@@ -3,6 +3,7 @@
 #include <Sha512.hpp>
 #include <Logging.hpp>
 #include <memory.hpp>
+#include <CommandTree.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
@@ -53,7 +54,7 @@ void Server::init(int argc, char** argv)
     int port = std::stoi(this->options.findOption("port"));
     if(port < 0 || port > 65535)
         throw std::runtime_error("invalid port");
-    this->listener.create(Socket::Tcp);
+    this->listener.create(Socket::Tcp, Socket::INet, SOCK_CLOEXEC);
     this->listener.bind(port);
     this->listener.listen();
 }
@@ -66,27 +67,37 @@ void Server::loopAcceptConn()
     IpAddress ip;
     uint16_t port;
 
-    while(this->listener.accept(ip, port, sock))
+    try
     {
-        this->mutex.lock();
+        while(this->listener.accept(ip, port, sock))
+        {
+            this->mutex.lock();
 
-        if(this->listener.isValid() == false)
-            break;
+            if(this->listener.isValid() == false)
+                break;
 
-        this->clients.push_back(new Client(std::move(sock), ip, port));
-        this->handlers.push_back(new Thread(&Server::handleClient, this, this->clients.size() - 1));
-
-        for(std::size_t i = 0; i < this->handlers.size(); ++i)
-            if(this->handlers[i]->isAlive() == false)
+            if(fcntl(sock.getFD(), F_SETFD, FD_CLOEXEC) == -1)
+                sock.close();
+            else
             {
-                delete this->clients[i];
-                delete this->handlers[i];
-                this->handlers.erase(this->handlers.begin() + i);
-                this->clients.erase(this->clients.begin() + i);
+                this->clients.push_back(new Client(std::move(sock), ip, port));
+                this->handlers.push_back(new Thread(&Server::handleClient, this, this->clients.size() - 1));
+
+                for(std::size_t i = 0; i < this->handlers.size(); ++i)
+                    if(this->handlers[i]->isAlive() == false)
+                    {
+                        delete this->clients[i];
+                        delete this->handlers[i];
+                        this->handlers.erase(this->handlers.begin() + i);
+                        this->clients.erase(this->clients.begin() + i);
+                    }
             }
 
-        this->mutex.unlock();
+            this->mutex.unlock();
+        }
     }
+    catch(...)
+    {}
 }
 
 void Server::loopInterface()
@@ -208,7 +219,7 @@ void Server::handleClient(std::size_t index)
         {
             if(select(std::max(client.sock.getFD(), client.pipe.getReadFD()) + 1, &fdset, nullptr, nullptr, nullptr) > 0)
             {
-                client.mutex.lock();
+                Lock(client.mutex);
 
                 // Command from server thread
                 if(FD_ISSET(client.pipe.getReadFD(), &fdset))
@@ -222,20 +233,28 @@ void Server::handleClient(std::size_t index)
                 else if(FD_ISSET(client.sock.getFD(), &fdset))
                 {
                     client.sock.recvString(buffer);
-                    std::vector<std::string> cmd = this->parseCommand(buffer.c_str());
+                    CommandTree(buffer).execute(&Server::executeClientCommand, this);
 
-                    if(cmd.size() != 0)
-                        must_exit = this->executeClientCommand(cmd) == false;
                     client.sock.send8(0);
                 }
-
-                client.mutex.unlock();
             }
         }
+        catch(ExitEvent& e)
+        {
+            must_exit = true;
+        }
         catch(Socket::ReceiveError& e)
-        {}
+        {
+            must_exit = true;
+        }
+        catch(Socket::SendError& e)
+        {
+            must_exit = true;
+        }
         catch(...)
-        {}
+        {
+            must_exit = true;
+        }
     }
 
     client.sock.close();
@@ -294,12 +313,31 @@ bool Server::executeServerCommand(Client& client)
     return true;
 }
 
-bool Server::executeClientCommand(std::vector<std::string>& cmd)
+int Server::executeClientCommand(const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
 {
-    if(cmd[0] == "exit")
-        return false;
+    ((void)stdinfd); ((void)stdoutfd); ((void)stderrfd); ((void)async);
 
-    return true;
+    if(cmd[0] == "exit")
+        throw ExitEvent();
+
+    int exit_code = 0;
+    pid_t pid = fork();
+
+    if(pid == -1)
+    {
+        int argc = static_cast<int>(cmd.size());
+        char** argv = new char*[argc + 1];
+        argv[argc] = nullptr;
+
+        for(int i = 0; i < argc; ++i)
+        {
+            argv[i] = new char[cmd[i].length() + 1];
+            strcpy(argv[i], cmd[i].c_str());
+        }
+    }
+
+
+    return exit_code;
 }
 
 

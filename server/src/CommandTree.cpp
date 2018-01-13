@@ -1,11 +1,5 @@
 #include <CommandTree.hpp>
-#include <Pipe.hpp>
-#include <stdexcept>
 #include <cstring>
-#include <cstdlib>
-#include <cassert>
-#include <unistd.h>
-#include <fcntl.h>
 
 
 
@@ -25,23 +19,13 @@ bool CommandTree::Node::isOperand() const
 
 
 // CommandTree
-CommandTree::CommandTree() : root(nullptr), callback(nullptr), size(0)
+CommandTree::CommandTree() : root(nullptr), size(0)
 {}
-CommandTree::CommandTree(Callback callback) : root(nullptr), callback(callback), size(0)
-{}
-CommandTree::CommandTree(const char* cmd) : root(nullptr), callback(nullptr), size(0)
+CommandTree::CommandTree(const char* cmd) : root(nullptr), size(0)
 {
     this->parse(cmd);
 }
-CommandTree::CommandTree(const std::string& cmd) : root(nullptr), callback(nullptr), size(0)
-{
-    this->parse(cmd);
-}
-CommandTree::CommandTree(Callback callback, const char* cmd) : root(nullptr), callback(callback), size(0)
-{
-    this->parse(cmd);
-}
-CommandTree::CommandTree(Callback callback, const std::string& cmd) : root(nullptr), callback(callback), size(0)
+CommandTree::CommandTree(const std::string& cmd) : root(nullptr), size(0)
 {
     this->parse(cmd);
 }
@@ -111,11 +95,6 @@ CommandTree& CommandTree::parse(const std::string& cmd)
     return this->parse(cmd.c_str());
 }
 
-int CommandTree::execute() const
-{
-    return this->executeSubtree(this->root, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);
-}
-
 
 
 void CommandTree::clear()
@@ -127,18 +106,10 @@ void CommandTree::clear()
         this->size = 0;
     }
 }
-void CommandTree::setCallback(Callback callback)
-{
-    this->callback = callback;
-}
 
 std::size_t CommandTree::getSize() const
 {
     return this->size;
-}
-CommandTree::Callback CommandTree::getCallback() const
-{
-    return this->callback;
 }
 
 
@@ -287,21 +258,21 @@ std::size_t CommandTree::deleteSubtree(Node* root)
 
 
 
-int CommandTree::executeSubtree(Node* root, int stdinfd, int stdoutfd, int stderrfd) const
+int CommandTree::executeSubtree(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
     switch(root->operation)
     {
-    case Node::Execute:  return this->executeSubtreeExecute (root, stdinfd, stdoutfd, stderrfd, false);
-    case Node::Sequence: return this->executeSubtreeSequence(root, stdinfd, stdoutfd, stderrfd);
-    case Node::And:      return this->executeSubtreeAnd     (root, stdinfd, stdoutfd, stderrfd);
-    case Node::Or:       return this->executeSubtreeOr      (root, stdinfd, stdoutfd, stderrfd);
-    case Node::Pipe:     return this->executeSubtreePipe    (root, stdinfd, stdoutfd, stderrfd);
+    case Node::Execute:  return this->executeSubtreeExecute (root, stdinfd, stdoutfd, stderrfd, false, callback);
+    case Node::Sequence: return this->executeSubtreeSequence(root, stdinfd, stdoutfd, stderrfd, callback);
+    case Node::And:      return this->executeSubtreeAnd     (root, stdinfd, stdoutfd, stderrfd, callback);
+    case Node::Or:       return this->executeSubtreeOr      (root, stdinfd, stdoutfd, stderrfd, callback);
+    case Node::Pipe:     return this->executeSubtreePipe    (root, stdinfd, stdoutfd, stderrfd, callback);
     }
 
     return 0;
 }
 
-int CommandTree::executeSubtreeExecute(Node* root, int stdinfd, int stdoutfd, int stderrfd, bool async) const
+int CommandTree::executeSubtreeExecute(Node* root, int stdinfd, int stdoutfd, int stderrfd, bool async, std::function<callback_t>& callback) const
 {
     assert(root->operation == Node::Execute);
     const int stdinfd_def  = stdinfd;
@@ -340,7 +311,7 @@ int CommandTree::executeSubtreeExecute(Node* root, int stdinfd, int stdoutfd, in
         stdinfd  = open_file(stdinfd , root->stdin_filename , O_RDONLY);
         stdoutfd = open_file(stdoutfd, root->stdout_filename, O_WRONLY | O_CREAT | O_TRUNC);
         stderrfd = open_file(stderrfd, root->stderr_filename, O_WRONLY | O_CREAT | O_TRUNC);
-        exit_code = this->callback(root->cmd, stdinfd, stdoutfd, stderrfd, async);
+        exit_code = callback(root->cmd, stdinfd, stdoutfd, stderrfd, async);
     }
     catch(...)
     {
@@ -354,35 +325,35 @@ int CommandTree::executeSubtreeExecute(Node* root, int stdinfd, int stdoutfd, in
     return exit_code;
 }
 
-int CommandTree::executeSubtreeSequence(Node* root, int stdinfd, int stdoutfd, int stderrfd) const
+int CommandTree::executeSubtreeSequence(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
-    this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false);
-    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);
+    this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false, callback);
+    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO, callback);
 }
 
-int CommandTree::executeSubtreeAnd(Node* root, int stdinfd, int stdoutfd, int stderrfd) const
+int CommandTree::executeSubtreeAnd(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
-    const int exit_code = this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false);
+    const int exit_code = this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false, callback);
     if(exit_code != 0)
         return exit_code;
 
-    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);
+    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO, callback);
 }
 
-int CommandTree::executeSubtreeOr(Node* root, int stdinfd, int stdoutfd, int stderrfd) const
+int CommandTree::executeSubtreeOr(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
-    const int exit_code = this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false);
+    const int exit_code = this->executeSubtreeExecute(root->left, stdinfd, stdoutfd, stderrfd, false, callback);
     if(exit_code == 0)
         return exit_code;
 
-    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO);
+    return this->executeSubtree(root->right, STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO, callback);
 }
 
-int CommandTree::executeSubtreePipe(Node* root, int stdinfd, int stdoutfd, int stderrfd) const
+int CommandTree::executeSubtreePipe(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
     ((void)stdoutfd);
 
     Pipe pipe;
-    this->executeSubtreeExecute(root->left, stdinfd, pipe.getWriteFD(), stderrfd, true);
-    return this->executeSubtree(root->right, pipe.getReadFD(), STDOUT_FILENO, STDERR_FILENO);
+    this->executeSubtreeExecute(root->left, stdinfd, pipe.getWriteFD(), stderrfd, true, callback);
+    return this->executeSubtree(root->right, pipe.getReadFD(), STDOUT_FILENO, STDERR_FILENO, callback);
 }
