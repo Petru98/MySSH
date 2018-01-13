@@ -94,7 +94,7 @@ void Server::loopInterface()
     std::string line_str;
     bool must_exit = false;
 
-    while(must_exit == false && std::getline(std::cin, line_str))
+    while(must_exit == false && std::cout << "> " && std::getline(std::cin, line_str))
     {
         std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
 
