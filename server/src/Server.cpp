@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
+#include <sys/wait.h>
 
 
 
@@ -236,7 +237,7 @@ void Server::handleClient(std::size_t index)
                 else if(FD_ISSET(client.sock.getFD(), &fdset))
                 {
                     client.sock.recvString(buffer);
-                    CommandTree(buffer).execute(&Server::executeClientCommand, this);
+                    CommandTree(buffer).execute(&Server::executeClientCommand, this, index);
 
                     client.sock.send8(0);
                 }
@@ -316,29 +317,84 @@ bool Server::executeServerCommand(Client& client)
     return true;
 }
 
-int Server::executeClientCommand(const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
+int Server::executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
 {
-    ((void)stdinfd); ((void)stdoutfd); ((void)stderrfd); ((void)async);
-
     if(cmd[0] == "exit")
         throw ExitEvent();
 
+    Client& client = (*this->clients[index]);
     int exit_code = 0;
     pid_t pid = fork();
 
     if(pid == -1)
     {
+        constexpr char msg[] = "server: internal error";
+        client.sock.sendString(msg, sizeof(msg) - 1);
+        exit_code = -1;
+    }
+    else if(pid == 0)
+    {
         int argc = static_cast<int>(cmd.size());
-        char** argv = new char*[argc + 1];
-        argv[argc] = nullptr;
+        char** argv = nullptr;
 
-        for(int i = 0; i < argc; ++i)
+        try
         {
-            argv[i] = new char[cmd[i].length() + 1];
-            strcpy(argv[i], cmd[i].c_str());
+            argv = new char*[argc + 1];
+            argv[argc] = nullptr;
+
+            for(int i = 0; i < argc; ++i)
+            {
+                argv[i] = new char[cmd[i].length() + 1];
+                strcpy(argv[i], cmd[i].c_str());
+            }
+        }
+        catch(...)
+        {
+            exit(-1);
+        }
+
+        if(stdinfd != STDIN_FILENO)
+        {
+            ::close(STDIN_FILENO);
+            if(dup2(stdinfd, STDIN_FILENO) == -1)
+                exit(errno);
+        }
+        if(stdoutfd != STDIN_FILENO)
+        {
+            ::close(STDOUT_FILENO);
+            if(dup2(stdoutfd, STDOUT_FILENO) == -1)
+                exit(errno);
+        }
+        if(stderrfd != STDERR_FILENO)
+        {
+            ::close(STDIN_FILENO);
+            if(dup2(stderrfd, STDERR_FILENO) == -1)
+                exit(errno);
+        }
+
+        execvp(argv[0], argv);
+        exit(errno);
+    }
+    else
+    {
+        if(async == false)
+        {
+            int status;
+            waitpid(pid, &status, 0);
+
+            if(WIFEXITED(status))
+            {
+                exit_code = WEXITSTATUS(status);
+                if(exit_code != 0)
+                {
+                    constexpr char msg[] = "server: executable not found, permission denied or internal error";
+                    client.sock.sendString(msg, sizeof(msg) - 1);
+                }
+            }
+            else
+                exit_code = -1;
         }
     }
-
 
     return exit_code;
 }

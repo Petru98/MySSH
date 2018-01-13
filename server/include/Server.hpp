@@ -35,7 +35,7 @@ private:
     bool handleClientInit(Client& client);
 
     bool executeServerCommand(Client& client);
-    int executeClientCommand(const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
+    int executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
 
     void addUser(const std::string& name, const std::string& password);
     tinyxml2::XMLElement* findUser(const char* name);
