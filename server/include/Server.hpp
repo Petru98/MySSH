@@ -47,8 +47,8 @@ private:
 private:
     CommandLine options;
     tinyxml2::XMLDocument database;
-    CryptoPP::RSA::PublicKey public_key;
-    CryptoPP::RSA::PrivateKey private_key;
+    CryptoPP::RSA::PublicKey publickey;
+    CryptoPP::RSA::PrivateKey privatekey;
 
     Socket listener;
 

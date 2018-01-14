@@ -18,8 +18,8 @@ Server::Server()
     this->initializeOptions();
 
     CryptoPP::AutoSeededRandomPool rng;
-    this->private_key.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
-    this->public_key = this->private_key;
+    this->privatekey.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
+    this->publickey = this->privatekey;
 }
 Server::~Server()
 {}
@@ -203,19 +203,18 @@ bool Server::handleClientInit(Client& client)
     Lock(client.mutex);
 
     std::string buffer;
-    std::size_t size;
 
-    // TODO: Public key exchange
+    // Public key exchange
     client.sock.recvUnprocessed(buffer);
     client.publickey.Load(CryptoPP::StringSource(buffer, true).Ref());
 
-    client.publickey.Save(CryptoPP::StringSink(buffer).Ref());
+    this->publickey.Save(CryptoPP::StringSink(buffer).Ref());
     client.sock.sendUnprocessed(buffer);
 
-    client.sock.setKeys(&client.publickey, &this->private_key);
+    client.sock.setKeys(&client.publickey, &this->privatekey);
 
     // Username
-    size = client.sock.recvString(buffer);
+    client.sock.recvString(buffer);
 
     tinyxml2::XMLElement* user_info = this->findUser(buffer.c_str());
     if(user_info == nullptr)
@@ -227,12 +226,12 @@ bool Server::handleClientInit(Client& client)
     client.sock.send8(1);
 
     // Password
-    size = client.sock.recvString(buffer);
+    client.sock.recvString(buffer);
 
     char recvpasshash[Sha512::DIGEST_SIZE];
     char dbpasshash[sizeof(recvpasshash)];
     fromHex(user_info->FirstChildElement(buffer.c_str())->GetText(), dbpasshash);
-    Sha512(buffer.c_str(), size).finish(recvpasshash);
+    Sha512(buffer.c_str(), buffer.length()).finish(recvpasshash);
 
     if(memcmp(dbpasshash, recvpasshash, Sha512::DIGEST_SIZE) != 0)
     {

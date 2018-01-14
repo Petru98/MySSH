@@ -26,8 +26,8 @@ private:
 
 private:
     CommandLine options;
-    CryptoPP::RSA::PrivateKey private_key;
-    CryptoPP::RSA::PublicKey public_key;
+    CryptoPP::RSA::PrivateKey privatekey;
+    CryptoPP::RSA::PublicKey publickey;
 
     Server server;
 };

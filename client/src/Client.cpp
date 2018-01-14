@@ -1,5 +1,6 @@
 #include <Client.hpp>
 #include <pgpdef.hpp>
+#include <iostream>
 #include <cryptopp/osrng.h>
 
 
@@ -9,8 +10,8 @@ Client::Client()
     this->initializeOptions();
 
     CryptoPP::AutoSeededRandomPool rng;
-    this->private_key.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
-    this->public_key = this->private_key;
+    this->privatekey.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
+    this->publickey = this->privatekey;
 }
 Client::~Client()
 {}
@@ -50,6 +51,32 @@ void Client::init(int argc, char** argv)
 
 
     this->server.sock.connect(this->server.ip, this->server.port);
+    std::string buffer;
+
+    // Public key exchange
+    this->publickey.Save(CryptoPP::StringSink(buffer).Ref());
+    this->server.sock.sendUnprocessed(buffer);
+
+    this->server.sock.recvUnprocessed(buffer);
+    this->server.publickey.Load(CryptoPP::StringSource(buffer, true).Ref());
+
+    this->server.sock.setKeys(&this->server.publickey, &this->privatekey);
+
+    // Username
+    std::cout << "username: ";
+    std::getline(std::cin, buffer);
+
+    this->server.sock.send(buffer);
+    if(this->server.sock.recv8() != 1)
+        throw std::runtime_error("no user with this username exists");
+
+    // Password
+    std::cout << "password: ";
+    std::getline(std::cin, buffer);
+
+    this->server.sock.send(buffer);
+    if(this->server.sock.recv8() != 1)
+        throw std::runtime_error("incorrect password");
 }
 
 void Client::run(int argc, char** argv)
