@@ -2,10 +2,8 @@
 #define INCLUDED_SOCKET_HPP
 
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <string>
 #include <vector>
-#include <algorithm>
 #include "IpAddress.hpp"
 #include "FileDescriptor.hpp"
 
@@ -29,7 +27,8 @@ public:
 
     enum Flags
     {
-        NonBlock = SOCK_NONBLOCK
+        NonBlock = SOCK_NONBLOCK,
+        CloseOnExec = SOCK_CLOEXEC
     };
 
 
@@ -71,15 +70,12 @@ public:
 
     void create(Protocols protocol, int family = INet, int flags = 0);
     void close();
-
     bool isValid() const;
 
     void bind(uint16_t port, IpAddress address = IpAddress::Any);
     void listen(int max_pending_connections = 0);
     bool accept(IpAddress& address, uint16_t& port, Socket& sock);
     bool connect(IpAddress address, uint16_t port);
-
-
 
     void sendSize(std::size_t data, int flags = 0);
     std::size_t recvSize(int flags = 0);
@@ -99,22 +95,13 @@ public:
     std::size_t recvString(char* buffer, std::size_t size = 0, int flags = 0);
     std::size_t recvString(std::string& buffer, std::size_t size = 0, int flags = 0);
 
+protected:
+    virtual void onSend(const uint8_t* data, std::size_t size);
+    virtual void onReceive(uint8_t* data, std::size_t size);
+
 
 
 protected:
-    virtual void onSend(const uint8_t* data, std::size_t size)
-    {
-        this->buffer.assign(data, data + size);
-    }
-    virtual void onReceive(uint8_t* data, std::size_t size)
-    {
-        size = this->buffer.size();
-        std::copy_n(this->buffer.data(), size, data);
-    }
-
-
-
-private:
     int family; ///< Protocol family
     std::vector<uint8_t> buffer; ///< Buffer used internally
 };
@@ -127,11 +114,8 @@ template <typename T>
 T ntoh(T x)
 {
     T y = 0;
-
     for(unsigned i = 0; i < sizeof(x) / 2; ++i)
-    {
         y = ((x >> (8 * i)) & 0xff) | ((x >> (8 * (sizeof(x) - i - 1))) & 0xff);
-    }
 
     return y;
 }

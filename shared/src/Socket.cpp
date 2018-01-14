@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <limits>
+#include <algorithm>
 
 
 
@@ -294,4 +295,17 @@ std::size_t Socket::recvString(std::string& buffer, std::size_t size, int flags)
     buffer.resize(receive_length);
     this->recv(const_cast<char*>(buffer.c_str()), receive_length, flags);
     return length - receive_length;
+}
+
+
+
+void Socket::onSend(const uint8_t* data, std::size_t size)
+{
+    this->buffer.assign(data, data + size);
+}
+
+void Socket::onReceive(uint8_t* data, std::size_t size)
+{
+    size = this->buffer.size();
+    std::copy_n(this->buffer.data(), size, data);
 }

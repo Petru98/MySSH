@@ -1,13 +1,15 @@
 #include <PgpSocket.hpp>
+#include <algorithm>
 
-const void* PgpSocket::onSend(const uint8_t* data, std::size_t& size)
+
+
+void PgpSocket::onSend(const uint8_t* data, std::size_t size)
 {
-    return data;
-    ((void)size);
+    this->buffer.assign(data, data + size);
 }
 
-void PgpSocket::onReceive(uint8_t* data, std::size_t& size)
+void PgpSocket::onReceive(uint8_t* data, std::size_t size)
 {
-    ((void)data);
-    ((void)size);
+    size = this->buffer.size();
+    std::copy_n(this->buffer.data(), size, data);
 }
