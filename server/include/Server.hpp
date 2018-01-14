@@ -22,23 +22,23 @@ private:
 
 
 
+    void initializeOptions();
     void init(int argc, char** argv);
-    void loopAcceptConn();
-    void loopInterface();
     void free();
 
-    void initializeOptions();
-    void parseArgs(int argc, char** argv);
-    std::vector<std::string> parseCommand(const char* buffer);
-
+    void loopAcceptConn();
     void handleClient(std::size_t index);
     bool handleClientInit(Client& client);
+    int  executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
 
+    void loopInterface();
     bool executeServerCommand(Client& client);
-    int executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
+    std::vector<std::string> parseCommand(const char* buffer);
 
-    void addUser(const std::string& name, const std::string& password);
     tinyxml2::XMLElement* findUser(const char* name);
+    tinyxml2::XMLElement* findUser(const std::string& name);
+    void addUser(const std::string& name, const std::string& password);
+    void removeUser(const std::string& name);
 
 
 

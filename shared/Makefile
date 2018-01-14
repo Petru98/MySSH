@@ -60,7 +60,7 @@ ifneq (clean,$(TARGET))
     # Preprocessor/C/C++/Linker flags
     CPPFLAGS := -DNDEBUG
     CFLAGS   := -Wall -Wextra -O3
-    CXXFLAGS := -std=c++17
+    CXXFLAGS := -std=c++14
     LDFLAGS  :=
 
     CPPFLAGS += $(addprefix -I,$(INCDIR))

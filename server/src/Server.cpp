@@ -20,22 +20,17 @@ Server::~Server()
 
 
 
-void Server::run(int argc, char** argv)
+void Server::initializeOptions()
 {
-    this->init(argc, argv);
-
-    Thread runner(&Server::loopAcceptConn, this);
-    runner.detach();
-    this->loopInterface();
-
-    this->free();
+    this->options.addOption('d', "database", "db.xml");
+    this->options.addOption('p', "port", "1100");
 }
 
 
 
 void Server::init(int argc, char** argv)
 {
-    this->parseArgs(argc, argv);
+    this->options.parse(argc, argv);
     tinyxml2::XMLError xmlerr = this->database.LoadFile(this->options.findOption("database").c_str());
 
     if(xmlerr == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
@@ -63,6 +58,35 @@ void Server::init(int argc, char** argv)
     this->listener.create(Socket::Tcp, Socket::INet, SOCK_CLOEXEC);
     this->listener.bind(port);
     this->listener.listen();
+}
+
+void Server::run(int argc, char** argv)
+{
+    this->init(argc, argv);
+
+    Thread runner(&Server::loopAcceptConn, this);
+    runner.detach();
+    this->loopInterface();
+
+    this->free();
+}
+
+void Server::free()
+{
+    Lock lock(this->mutex);
+
+    this->listener.close();
+
+    for(std::size_t i = 0; i < this->clients.size(); ++i)
+    {
+        this->clients[i]->disconnect();
+        this->handlers[i]->join();
+        delete this->clients[i];
+        delete this->handlers[i];
+    }
+
+    this->clients.clear();
+    this->handlers.clear();
 }
 
 
@@ -105,107 +129,6 @@ void Server::loopAcceptConn()
     catch(...)
     {}
 }
-
-void Server::loopInterface()
-{
-    std::string line_str;
-    bool must_exit = false;
-
-    while(must_exit == false && std::cout << "> " && std::getline(std::cin, line_str))
-    {
-        std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
-
-        if(cmd.size() > 0)
-        {
-            if(cmd[0] == "exit")
-                must_exit = true;
-            else if(cmd[0] == "adduser")
-            {
-                if(cmd.size() - 1 != 2)
-                    error("invalid number of arguments");
-                else
-                {
-                    try
-                        {this->addUser(cmd[1], cmd[2]);}
-                    catch(std::exception& e)
-                        {error(e.what());}
-                }
-            }
-            else
-                error("unknown command");
-        }
-    }
-}
-
-void Server::free()
-{
-    Lock lock(this->mutex);
-
-    this->listener.close();
-
-    for(std::size_t i = 0; i < this->clients.size(); ++i)
-    {
-        this->clients[i]->disconnect();
-        this->handlers[i]->join();
-        delete this->clients[i];
-        delete this->handlers[i];
-    }
-
-    this->clients.clear();
-    this->handlers.clear();
-}
-
-
-
-void Server::initializeOptions()
-{
-    this->options.addOption('d', "database", "db.xml");
-    this->options.addOption('p', "port", "1100");
-}
-
-void Server::parseArgs(int argc, char** argv)
-{
-    this->options.parse(argc, argv);
-}
-std::vector<std::string> Server::parseCommand(const char* buffer)
-{
-    constexpr char delims[] = " \t";
-    bool done = ((*buffer) == '\0');
-    std::vector<std::string> argv;
-
-    while(done == false)
-    {
-        while((*buffer) != '\0' && strchr(delims, *buffer) != nullptr)
-            ++buffer;
-
-        if((*buffer) == '\0')
-        {
-            done = true;
-        }
-        else
-        {
-            std::string str;
-            bool quotes_open = false;
-
-            while((*buffer) != '\0' && (quotes_open == true || strchr(delims, *buffer) == nullptr))
-            {
-                if((*buffer) == '\"')
-                    quotes_open = !quotes_open;
-
-                str.push_back(*buffer);
-                ++buffer;
-            }
-
-            done = ((*buffer) == '\0');
-            ++buffer;
-            argv.push_back(std::move(str));
-        }
-    }
-
-    return std::move(argv);
-}
-
-
 
 void Server::handleClient(std::size_t index)
 {
@@ -308,20 +231,6 @@ bool Server::handleClientInit(Client& client)
     return true;
 }
 
-bool Server::executeServerCommand(Client& client)
-{
-
-    uint8_t code;
-    client.pipe.read(&code, sizeof(code));
-
-    switch(code)
-    {
-    case 0: return false;
-    }
-
-    return true;
-}
-
 int Server::executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
 {
     if(cmd[0] == "exit")
@@ -408,7 +317,117 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
 
 
 
+void Server::loopInterface()
+{
+    std::string line_str;
+    bool must_exit = false;
 
+    while(must_exit == false && std::cout << "> " && std::getline(std::cin, line_str))
+    {
+        std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
+
+        if(cmd.size() > 0)
+        {
+            try
+            {
+                if(cmd[0] == "exit")
+                    must_exit = true;
+                else if(cmd[0] == "adduser")
+                {
+                    if(cmd.size() - 1 != 2)
+                        error("invalid number of arguments");
+                    else
+                        this->addUser(cmd[1], cmd[2]);
+                }
+                else if(cmd[0] == "rmuser")
+                {
+                    if(cmd.size() - 1 != 1)
+                        error("invalid number of arguments");
+                    else
+                        this->removeUser(cmd[1]);
+                }
+                else
+                    error("unknown command");
+            }
+            catch(std::exception& e)
+            {
+                error(e.what());
+            }
+        }
+    }
+}
+
+bool Server::executeServerCommand(Client& client)
+{
+
+    uint8_t code;
+    client.pipe.read(&code, sizeof(code));
+
+    switch(code)
+    {
+    case 0: return false;
+    }
+
+    return true;
+}
+
+std::vector<std::string> Server::parseCommand(const char* buffer)
+{
+    constexpr char delims[] = " \t";
+    bool done = ((*buffer) == '\0');
+    std::vector<std::string> argv;
+
+    while(done == false)
+    {
+        while((*buffer) != '\0' && strchr(delims, *buffer) != nullptr)
+            ++buffer;
+
+        if((*buffer) == '\0')
+        {
+            done = true;
+        }
+        else
+        {
+            std::string str;
+            bool quotes_open = false;
+
+            while((*buffer) != '\0' && (quotes_open == true || strchr(delims, *buffer) == nullptr))
+            {
+                if((*buffer) == '\"')
+                    quotes_open = !quotes_open;
+
+                str.push_back(*buffer);
+                ++buffer;
+            }
+
+            done = ((*buffer) == '\0');
+            ++buffer;
+            argv.push_back(std::move(str));
+        }
+    }
+
+    return std::move(argv);
+}
+
+
+
+tinyxml2::XMLElement* Server::findUser(const char* name)
+{
+    tinyxml2::XMLElement* xml = this->database.RootElement();
+    assert(xml != nullptr);
+    tinyxml2::XMLElement* users = xml->FirstChildElement("users");
+    assert(users != nullptr);
+
+    tinyxml2::XMLElement* user = users->FirstChildElement("user");
+    while(user != nullptr && user->FirstChildElement("name") != nullptr && strcmp(user->FirstChildElement("name")->GetText(), name) != 0)
+        user = user->NextSiblingElement("user");
+
+    return user;
+}
+tinyxml2::XMLElement* Server::findUser(const std::string& name)
+{
+    return this->findUser(name.c_str());
+}
 
 void Server::addUser(const std::string& name, const std::string& password)
 {
@@ -418,7 +437,7 @@ void Server::addUser(const std::string& name, const std::string& password)
     assert(users != nullptr);
 
 
-    tinyxml2::XMLElement* user = this->findUser(name.c_str());
+    tinyxml2::XMLElement* user = this->findUser(name);
     if(user != nullptr)
         throw std::runtime_error("an user with the same name already exists");
 
@@ -457,16 +476,12 @@ void Server::addUser(const std::string& name, const std::string& password)
     this->database.SaveFile(this->options.findOption("database").c_str());
 }
 
-tinyxml2::XMLElement* Server::findUser(const char* name)
+void Server::removeUser(const std::string& name)
 {
-    tinyxml2::XMLElement* xml = this->database.RootElement();
-    assert(xml != nullptr);
-    tinyxml2::XMLElement* users = xml->FirstChildElement("users");
-    assert(users != nullptr);
+    tinyxml2::XMLElement* user = this->findUser(name);
+    if(user == nullptr)
+        throw std::runtime_error("user not found");
 
-    tinyxml2::XMLElement* user = users->FirstChildElement("user");
-    while(user != nullptr && user->FirstChildElement("name") != nullptr && strcmp(user->FirstChildElement("name")->GetText(), name) != 0)
-        user = user->NextSiblingElement("user");
-
-    return user;
+    user->DeleteChildren();
+    this->database.DeleteNode(user);
 }

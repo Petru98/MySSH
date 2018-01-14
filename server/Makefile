@@ -43,8 +43,8 @@ DEPDIR := .d
 ifneq (clean,$(TARGET))
     # C/C++ compiler, linker and assembler
     CC  := gcc
-    CXX := g++-7.2.0
-    LD  := g++-7.2.0
+    CXX := g++
+    LD  := g++
 
 
 
@@ -92,7 +92,7 @@ ifneq (clean,$(TARGET))
 
 
     # Preprocessor/C/C++/Linker flags
-    CPPFLAGS := -DNDEBUG
+    CPPFLAGS :=
     CFLAGS   := -Wall -Wextra
     CXXFLAGS := -std=c++14
     LDFLAGS  :=
@@ -130,8 +130,9 @@ debug: $(NAME)-d
 
 
 # Build binary files
-$(NAME): CFLAGS += -O3
-$(NAME): CXXFLAGS += -O3
+$(NAME): CPPFLAGS += -DNDEBUG
+$(NAME): CFLAGS += -DNDEBUG -O3
+$(NAME): CXXFLAGS += -DNDEBUG -O3
 
 $(NAME): $(OBJS)
 	@echo "Linking"     \

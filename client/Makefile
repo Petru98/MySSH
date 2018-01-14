@@ -4,7 +4,6 @@
 # Shell commands
 RM := rm -f
 MV := mv -f
-LN := ln -f
 MKDIR := mkdir -p
 
 # The name of the final binary file
@@ -58,7 +57,8 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := tinyxml2 Thread Mutex Lock PgpSocket Socket IpAddress Logging
+    SHAREDOBJS   := tinyxml2 PgpSocket Socket IpAddress CommandLine Lock Mutex Thread FileDescriptor \
+                    memory
     SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
@@ -92,9 +92,9 @@ ifneq (clean,$(TARGET))
 
 
     # Preprocessor/C/C++/Linker flags
-    CPPFLAGS := -DNDEBUG
+    CPPFLAGS :=
     CFLAGS   := -Wall -Wextra
-    CXXFLAGS := -std=c++17
+    CXXFLAGS := -std=c++14
     LDFLAGS  :=
 
     CPPFLAGS += $(addprefix -I,$(INCDIR))
@@ -130,8 +130,9 @@ debug: $(NAME)-d
 
 
 # Build binary files
-$(NAME): CFLAGS += -O3
-$(NAME): CXXFLAGS += -O3
+$(NAME): CPPFLAGS += -DNDEBUG
+$(NAME): CFLAGS += -DNDEBUG -O3
+$(NAME): CXXFLAGS += -DNDEBUG -O3
 
 $(NAME): $(OBJS)
 	@echo "Linking"     \
