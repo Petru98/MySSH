@@ -1,9 +1,9 @@
 #include <Server.hpp>
 #include <Lock.hpp>
-#include <Sha512.hpp>
 #include <Logging.hpp>
-#include <memory.hpp>
 #include <CommandTree.hpp>
+#include <memory.hpp>
+#include <Sha512.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
@@ -319,39 +319,46 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
 
 void Server::loopInterface()
 {
-    std::string line_str;
+    std::string input;
     bool must_exit = false;
 
-    while(must_exit == false && std::cout << "> " && std::getline(std::cin, line_str))
+    while(must_exit == false)
     {
-        std::vector<std::string> cmd = this->parseCommand(line_str.c_str());
+        print("> ");
 
-        if(cmd.size() > 0)
+        if(!std::getline(std::cin, input))
+            must_exit = true;
+        else
         {
-            try
+            std::vector<std::string> cmd = this->parseCommand(input.c_str());
+
+            if(cmd.size() > 0)
             {
-                if(cmd[0] == "exit")
-                    must_exit = true;
-                else if(cmd[0] == "adduser")
+                try
                 {
-                    if(cmd.size() - 1 != 2)
-                        error("invalid number of arguments");
+                    if(cmd[0] == "exit")
+                        must_exit = true;
+                    else if(cmd[0] == "adduser")
+                    {
+                        if(cmd.size() - 1 != 2)
+                            error("invalid number of arguments");
+                        else
+                            this->addUser(cmd[1], cmd[2]);
+                    }
+                    else if(cmd[0] == "rmuser")
+                    {
+                        if(cmd.size() - 1 != 1)
+                            error("invalid number of arguments");
+                        else
+                            this->removeUser(cmd[1]);
+                    }
                     else
-                        this->addUser(cmd[1], cmd[2]);
+                        error("unknown command");
                 }
-                else if(cmd[0] == "rmuser")
+                catch(std::exception& e)
                 {
-                    if(cmd.size() - 1 != 1)
-                        error("invalid number of arguments");
-                    else
-                        this->removeUser(cmd[1]);
+                    error(e.what());
                 }
-                else
-                    error("unknown command");
-            }
-            catch(std::exception& e)
-            {
-                error(e.what());
             }
         }
     }
