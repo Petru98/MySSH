@@ -42,7 +42,7 @@ void Server::init(int argc, char** argv)
         if(users == nullptr)
             throw std::runtime_error(this->database.ErrorStr());
 
-        if(xml->InsertEndChild(users) == nullptr)
+        if(this->database.InsertFirstChild(xml) == nullptr || xml->InsertEndChild(users) == nullptr)
         {
             this->database.DeleteNode(users);
             this->database.DeleteNode(xml);
@@ -473,7 +473,8 @@ void Server::addUser(const std::string& name, const std::string& password)
     user->InsertEndChild(user_password);
     users->InsertEndChild(user);
 
-    this->database.SaveFile(this->options.findOption("database").c_str());
+    if(this->database.SaveFile(this->options.findOption("database").c_str()) != tinyxml2::XML_SUCCESS)
+        throw std::runtime_error(this->database.ErrorStr());
 }
 
 void Server::removeUser(const std::string& name)
@@ -484,4 +485,7 @@ void Server::removeUser(const std::string& name)
 
     user->DeleteChildren();
     this->database.DeleteNode(user);
+
+    if(this->database.SaveFile(this->options.findOption("database").c_str()) != tinyxml2::XML_SUCCESS)
+        throw std::runtime_error(this->database.ErrorStr());
 }
