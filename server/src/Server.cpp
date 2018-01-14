@@ -2,14 +2,13 @@
 #include <Lock.hpp>
 #include <Logging.hpp>
 #include <CommandTree.hpp>
-#include <memory.hpp>
 #include <pgpdef.hpp>
-#include <Sha512.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
 #include <cryptopp/osrng.h>
+#include <cryptopp/hex.h>
 
 
 
@@ -236,14 +235,22 @@ bool Server::handleClientInit(Client& client)
     client.sock.send8(1);
 
     // Password
+    std::string dbpasshash_bin;
+    CryptoPP::StringSource(user_info->FirstChildElement("password")->GetText(), true,
+        new CryptoPP::HexDecoder(
+            new CryptoPP::StringSink(dbpasshash_bin)
+        )
+    );
+
+    std::string recvpasshash_bin;
     client.sock.recvString(buffer);
+    CryptoPP::StringSource(buffer, true,
+        new CryptoPP::HashFilter(
+            CryptoPP::SHA512().Ref(), new CryptoPP::StringSink(recvpasshash_bin)
+        )
+    );
 
-    char recvpasshash[Sha512::DIGEST_SIZE];
-    char dbpasshash[sizeof(recvpasshash)];
-    fromHex(user_info->FirstChildElement(buffer.c_str())->GetText(), dbpasshash);
-    Sha512(buffer.c_str(), buffer.length()).finish(recvpasshash);
-
-    if(memcmp(dbpasshash, recvpasshash, Sha512::DIGEST_SIZE) != 0)
+    if(recvpasshash_bin != dbpasshash_bin)
     {
         client.sock.send8(0);
         return false;
@@ -495,13 +502,17 @@ void Server::addUser(const std::string& name, const std::string& password)
 
 
 
-    char password_hash[Sha512::DIGEST_SIZE];
-    char password_hash_hex[sizeof(password_hash) * 2 + 1];
-    Sha512(password.c_str(), password.length()).finish(password_hash);
-    toHex(password_hash, password_hash_hex);
+    std::string passhash_hex;
+    CryptoPP::StringSource(password, true,
+        new CryptoPP::HashFilter(CryptoPP::SHA512().Ref(),
+            new CryptoPP::HexEncoder(
+                new CryptoPP::StringSink(passhash_hex)
+            )
+        )
+    );
 
     user_name->SetText(name.c_str());
-    user_password->SetText(password_hash_hex);
+    user_password->SetText(passhash_hex.c_str());
     user->InsertEndChild(user_name);
     user->InsertEndChild(user_password);
     users->InsertEndChild(user);

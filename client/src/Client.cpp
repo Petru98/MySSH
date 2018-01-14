@@ -30,10 +30,13 @@ void Client::init(int argc, char** argv)
     this->options.parse(argc, argv);
 
     const std::vector<std::string>& args = this->options.getArguments();
-    if(args.size() == 0 || args.size() > 2)
+    if(args.size() > 2)
         throw std::runtime_error("invalid number of arguments");
 
-    this->server.ip = args[0];
+    if(args.size() >= 1)
+        this->server.ip = args[0];
+    else
+        this->server.ip = "0.0.0.0";
 
     if(args.size() >= 2)
     {

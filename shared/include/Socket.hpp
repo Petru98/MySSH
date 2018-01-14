@@ -2,6 +2,7 @@
 #define INCLUDED_SOCKET_HPP
 
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <string>
 #include <vector>
 #include "IpAddress.hpp"
@@ -178,19 +179,38 @@ std::size_t Socket::recv(Container& container, int flags)
 
 
 // Non-member
-template <typename T>
-T ntoh(T x)
+inline uint8_t ntoh(uint8_t x)
 {
-    T y = 0;
-    for(unsigned i = 0; i < sizeof(x) / 2; ++i)
-        y = ((x >> (8 * i)) & 0xff) | ((x >> (8 * (sizeof(x) - i - 1))) & 0xff);
-
-    return y;
+    return x;
 }
-template <typename T>
-T hton(T x)
+inline uint16_t ntoh(uint16_t x)
 {
-    return ntoh(x);
+    return ntohs(x);
+}
+inline uint32_t ntoh(uint32_t x)
+{
+    return ntohl(x);
+}
+inline uint64_t ntoh(uint64_t x)
+{
+    return (static_cast<uint64_t>(ntoh(static_cast<uint32_t>(x))) << 32) | ntoh(static_cast<uint32_t>(x >> 32));
+}
+
+inline uint8_t hton(uint8_t x)
+{
+    return x;
+}
+inline uint16_t hton(uint16_t x)
+{
+    return htons(x);
+}
+inline uint32_t hton(uint32_t x)
+{
+    return htonl(x);
+}
+inline uint64_t hton(uint64_t x)
+{
+    return (static_cast<uint64_t>(hton(static_cast<uint32_t>(x))) << 32) | hton(static_cast<uint32_t>(x >> 32));
 }
 
 #endif

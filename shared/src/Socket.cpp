@@ -177,7 +177,7 @@ std::size_t Socket::recvSize(int flags)
 
 void Socket::sendUnprocessed(const void* data, std::size_t size, int flags)
 {
-    if(data == nullptr || size == 0)
+    if(size == 0)
         return;
 
     this->sendSize(size, flags);
