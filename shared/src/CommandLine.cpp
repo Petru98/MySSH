@@ -69,6 +69,13 @@ std::string CommandLine::findOption(const std::string& key) const
 
 
 
+const std::vector<std::string>& CommandLine::getArguments() const
+{
+    return this->arguments;
+}
+
+
+
 void CommandLine::parse(int argc, char** argv)
 {
     if(argc == 1)

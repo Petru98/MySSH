@@ -22,6 +22,8 @@ public:
     std::string findOption(char key) const;
     std::string findOption(const std::string& key) const;
 
+    const std::vector<std::string>& getArguments() const;
+
     void parse(int argc, char** argv);
 
 
