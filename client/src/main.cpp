@@ -14,11 +14,11 @@ int main(int argc, char** argv)
     }
     catch(std::exception& e)
     {
-        std::cout << e.what();
+        std::cout << "error: " << e.what() << '\n';
     }
     catch(...)
     {
-        std::cout << "unknown error caught in 'main'";
+        std::cout << "error: unknown error caught in 'main'\n";
     }
 
     return 0;

@@ -13,7 +13,7 @@ public:
 
 
 
-private:
+public:
     CryptoPP::RSA::PublicKey publickey;
     PgpSocket sock;
     IpAddress ip;

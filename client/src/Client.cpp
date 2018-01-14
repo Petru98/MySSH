@@ -37,15 +37,17 @@ void Client::init(int argc, char** argv)
 
     if(args.size() >= 2)
     {
-        this->server.port = std::stoi(args[1]);
+        const int port = std::stoi(args[1]);
         if(port < 0 || port > 65535)
             throw std::runtime_error("invalid port");
+        this->server.port = port;
     }
     else
     {
-        int port = std::stoi(this->options.findOption("port"));
+        const int port = std::stoi(this->options.findOption("port"));
         if(port < 0 || port > 65535)
             throw std::runtime_error("invalid port");
+        this->server.port = port;
     }
 
 
@@ -95,5 +97,55 @@ void Client::free()
 
 void Client::loop()
 {
+    std::string prompt;
+    std::string buffer;
+    bool must_exit = false;
 
+    while(must_exit == false)
+    {
+        try
+        {
+            this->server.sock.recv(prompt);
+            std::cout << prompt;
+
+            if(!std::getline(std::cin, buffer))
+                must_exit = true;
+            else
+            {
+                this->server.sock.send(buffer);
+
+                int response = this->server.sock.recv8();
+                while(response == 1)
+                {
+                    this->server.sock.recv(buffer);
+                    std::cout << buffer;
+                }
+
+                if(response == 255)
+                {
+                    must_exit = true;
+                    std::cout << "\n";
+                }
+            }
+        }
+        catch(Socket::ReceiveError& e)
+        {
+            std::cout << "error: " << e.what() << '\n';
+            must_exit = true;
+        }
+        catch(Socket::SendError& e)
+        {
+            std::cout << "error: " << e.what() << '\n';
+            must_exit = true;
+        }
+        catch(std::exception& e)
+        {
+            std::cout << "error: " << e.what() << '\n';
+        }
+        catch(...)
+        {
+            std::cout << "error: unknown exception caught in 'Client::loop'\n";
+            must_exit = true;
+        }
+    }
 }

@@ -143,18 +143,21 @@ void Server::handleClient(std::size_t index)
         return;
 
     // Loop
+    std::string prompt = "$ ";
     std::string buffer;
     bool must_exit = false;
 
     while(must_exit == false)
     {
-        fd_set fdset;
-        FD_ZERO(&fdset);
-        FD_SET(client.sock.getFD(), &fdset);
-        FD_SET(client.pipe.getReadFD(), &fdset);
-
         try
         {
+            client.sock.send(prompt);
+
+            fd_set fdset;
+            FD_ZERO(&fdset);
+            FD_SET(client.sock.getFD(), &fdset);
+            FD_SET(client.pipe.getReadFD(), &fdset);
+
             if(select(std::max(client.sock.getFD(), client.pipe.getReadFD()) + 1, &fdset, nullptr, nullptr, nullptr) > 0)
             {
                 Lock(client.mutex);
@@ -166,7 +169,7 @@ void Server::handleClient(std::size_t index)
                 // Communication with the client
                 if(must_exit == true)
                 {
-                    client.sock.send8(-1);
+                    client.sock.send8(255);
                 }
                 else if(FD_ISSET(client.sock.getFD(), &fdset))
                 {
@@ -183,14 +186,21 @@ void Server::handleClient(std::size_t index)
         }
         catch(Socket::ReceiveError& e)
         {
+            error(e.what());
             must_exit = true;
         }
         catch(Socket::SendError& e)
         {
+            error(e.what());
             must_exit = true;
+        }
+        catch(std::exception& e)
+        {
+            error(e.what());
         }
         catch(...)
         {
+            error("unknown exception caught in 'Server::handleClient'");
             must_exit = true;
         }
     }
