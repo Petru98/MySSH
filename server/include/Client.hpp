@@ -26,7 +26,7 @@ public:
 
 public:
     Mutex mutex;
-    CryptoPP::RSA::PublicKey key;
+    CryptoPP::RSA::PublicKey publickey;
     Pipe pipe;
     PgpSocket sock;
     IpAddress ip;

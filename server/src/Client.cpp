@@ -6,7 +6,7 @@
 
 
 
-Client::Client(PgpSocket&& sock, IpAddress ip, uint16_t port) : mutex(), key(), pipe(), sock(std::move(sock)), ip(ip), port(port)
+Client::Client(PgpSocket&& sock, IpAddress ip, uint16_t port) : mutex(), publickey(), pipe(), sock(std::move(sock)), ip(ip), port(port)
 {}
 Client::~Client()
 {

@@ -3,17 +3,23 @@
 #include <Logging.hpp>
 #include <CommandTree.hpp>
 #include <memory.hpp>
+#include <pgpdef.hpp>
 #include <Sha512.hpp>
 #include <stdexcept>
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <cryptopp/osrng.h>
 
 
 
 Server::Server()
 {
     this->initializeOptions();
+
+    CryptoPP::AutoSeededRandomPool rng;
+    this->private_key.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
+    this->public_key = this->private_key;
 }
 Server::~Server()
 {}
@@ -200,8 +206,13 @@ bool Server::handleClientInit(Client& client)
     std::size_t size;
 
     // TODO: Public key exchange
-    client.sock.recv(buffer);
+    client.sock.recvUnprocessed(buffer);
+    client.publickey.Load(CryptoPP::StringSource(buffer, true).Ref());
 
+    client.publickey.Save(CryptoPP::StringSink(buffer).Ref());
+    client.sock.sendUnprocessed(buffer);
+
+    client.sock.setKeys(&client.publickey, &this->private_key);
 
     // Username
     size = client.sock.recvString(buffer);

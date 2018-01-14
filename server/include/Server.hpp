@@ -6,6 +6,7 @@
 #include <Thread.hpp>
 #include <tinyxml2.h>
 #include <vector>
+#include <cryptopp/rsa.h>
 
 
 
@@ -45,6 +46,8 @@ private:
 private:
     CommandLine options;
     tinyxml2::XMLDocument database;
+    CryptoPP::RSA::PublicKey public_key;
+    CryptoPP::RSA::PrivateKey private_key;
 
     Socket listener;
 

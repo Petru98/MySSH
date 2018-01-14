@@ -3,7 +3,7 @@
 
 namespace pgp
 {
-    constexpr unsigned KEY_SIZE = 4096;
+    constexpr unsigned RSA_KEY_SIZE = 4096;
 }
 
 #endif
