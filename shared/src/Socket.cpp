@@ -49,6 +49,24 @@ bool Socket::isValid() const
 
 
 
+IpAddress Socket::getIP() const
+{
+    throw NotImplemented();
+
+    return IpAddress();
+}
+uint16_t Socket::getPort() const
+{
+    sockaddr_in sin;
+    socklen_t len = sizeof(sin);
+
+    if(getsockname(this->fd, reinterpret_cast<sockaddr*>(&sin), &len) == -1)
+        throw GetPortError();
+    return ntohs(sin.sin_port);
+}
+
+
+
 void Socket::bind(uint16_t port, IpAddress address)
 {
     sockaddr_in addr = {};

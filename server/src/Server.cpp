@@ -374,6 +374,10 @@ void Server::loopInterface()
                         else
                             this->removeUser(cmd[1]);
                     }
+                    else if(cmd[0] == "status")
+                    {
+                        print("port: %u\n", this->listener.getPort());
+                    }
                     else
                         error("unknown command");
                 }

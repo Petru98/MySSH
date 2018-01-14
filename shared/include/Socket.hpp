@@ -36,11 +36,17 @@ public:
     class Error : public std::exception
     {};
 
+    class NotImplemented : public Error
+        {public: virtual const char* what() {return "Socket method is not implemented";}};
+
     class AlreadyCreatedError : public Error
         {public: virtual const char* what() {return "Socket was already created";}};
 
     class CreateError : public Error
         {public: virtual const char* what() {return "Could not create socket";}};
+
+    class GetPortError : public Error
+        {public: virtual const char* what() {return "Could not find the socket's port";}};
 
     class BindError : public Error
         {public: virtual const char* what() {return "Could not bind socket";}};
@@ -71,6 +77,9 @@ public:
     void create(Protocols protocol, int family = INet, int flags = 0);
     void close();
     bool isValid() const;
+
+    IpAddress getIP() const;
+    uint16_t getPort() const;
 
     void bind(uint16_t port, IpAddress address = IpAddress::Any);
     void listen(int max_pending_connections = 0);
