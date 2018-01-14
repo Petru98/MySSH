@@ -1,16 +1,17 @@
 #include <Server.hpp>
 #include <Logging.hpp>
-#include <exception>
+#include <iostream>
 
 
 
 int main(int argc, char** argv)
 {
-    Server server;
+    std::ios_base::sync_with_stdio(false);
 
     try
     {
-        server.run(argc, argv);
+        Server* server = new Server();
+        server->run(argc, argv);
     }
     catch(std::exception& e)
     {

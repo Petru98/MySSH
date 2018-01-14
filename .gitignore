@@ -1,5 +1,6 @@
 .ignore/
 .vscode/
+*.code-workspace
 
 **/.obj/
 **/.d/

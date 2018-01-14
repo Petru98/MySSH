@@ -57,8 +57,8 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := tinyxml2 PgpSocket Socket IpAddress CommandLine Lock Mutex Thread FileDescriptor \
-                    memory
+    SHAREDOBJS   := tinyxml2 PgpSocket Socket IpAddress CommandLine FileDescriptor memory \
+
     SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
