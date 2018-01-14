@@ -329,6 +329,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
     if(pid == -1)
     {
         constexpr char msg[] = "server: internal error";
+        client.sock.send8(1);
         client.sock.sendString(msg, sizeof(msg) - 1);
         exit_code = -1;
     }
@@ -388,6 +389,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
                 if(exit_code != 0)
                 {
                     constexpr char msg[] = "server: executable not found, permission denied or internal error";
+                    client.sock.send8(1);
                     client.sock.sendString(msg, sizeof(msg) - 1);
                 }
             }
