@@ -103,18 +103,11 @@ bool Socket::connect(IpAddress address, uint16_t port)
 
 
 
-void Socket::sendSize(std::size_t data, int flags)
+void Socket::sendRaw(const void* data, std::size_t size, int flags)
 {
-    if(data > std::numeric_limits<uint32_t>::max())
-        throw std::runtime_error("could not send size because it is too big");
-
-    const uint32_t fixed_data = hton(static_cast<uint32_t>(data));
-    const uint8_t* data_ptr = reinterpret_cast<const uint8_t*>(&fixed_data);
-    std::size_t data_remaining = sizeof(fixed_data);
-
-    while(data_remaining > 0)
+    while(size > 0)
     {
-        ssize_t sent = ::send(this->fd, &data_ptr, data_remaining, flags);
+        ssize_t sent = ::send(this->fd, data, size, flags);
         if(sent == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
@@ -122,20 +115,16 @@ void Socket::sendSize(std::size_t data, int flags)
         }
         else
         {
-            data_ptr = data_ptr + sent;
-            data_remaining -= sent;
+            data = reinterpret_cast<const uint8_t*>(data) + sent;
+            size -= sent;
         }
     }
 }
-std::size_t Socket::recvSize(int flags)
+void Socket::recvRaw(void* data, std::size_t size, int flags)
 {
-    uint32_t fixed_buffer;
-    uint8_t* buffer_ptr = reinterpret_cast<uint8_t*>(&fixed_buffer);
-    std::size_t buffer_remaining = sizeof(fixed_buffer);
-
-    while(buffer_remaining > 0)
+    while(size > 0)
     {
-        ssize_t received = ::recv(this->fd, &buffer_ptr, buffer_remaining, flags);
+        ssize_t received = ::recv(this->fd, data, size, flags);
         if(received == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
@@ -143,81 +132,75 @@ std::size_t Socket::recvSize(int flags)
         }
         else
         {
-            buffer_ptr = buffer_ptr + received;
-            buffer_remaining -= received;
+            data = reinterpret_cast<uint8_t*>(data) + received;
+            size -= received;
         }
     }
+}
 
-    return static_cast<std::size_t>(ntoh(fixed_buffer));
+
+
+void Socket::sendSize(std::size_t data, int flags)
+{
+    if(data > std::numeric_limits<uint32_t>::max())
+        throw std::runtime_error("could not send size because it is too big");
+
+    const uint32_t size = hton(static_cast<uint32_t>(data));
+    return this->sendRaw(&size, sizeof(size), flags);
+}
+std::size_t Socket::recvSize(int flags)
+{
+    uint32_t size;
+    this->recvRaw(&size, sizeof(size), flags);
+    return static_cast<std::size_t>(ntoh(size));
+}
+
+
+
+void Socket::sendUnprocessed(const void* data, std::size_t size, int flags)
+{
+    if(data == nullptr || size == 0)
+        return;
+
+    this->sendSize(size, flags);
+    return this->sendRaw(data, size, flags);
+}
+std::size_t Socket::recvUnprocessed(void* data, std::size_t size, int flags)
+{
+    if(size == 0)
+        return 0;
+
+    const std::size_t packet_size = this->recvSize(flags);
+    if(packet_size > size)
+        throw ReceiveError();
+
+    this->recvRaw(data, packet_size, flags);
+    return packet_size;
 }
 
 
 
 void Socket::send(const void* data, std::size_t size, int flags)
 {
-    if(data == nullptr || size == 0)
+    if(size == 0)
         return;
 
-    const uint32_t size_content = static_cast<uint32_t>(size);
     this->onSend(reinterpret_cast<const uint8_t*>(data), size);
-    const uint32_t size_packet = static_cast<uint32_t>(this->buffer.size());
-
-    // Send the sizes of the content and packet
-    this->sendSize(size_content, flags);
-    this->sendSize(size_packet, flags);
-
-    // Send the packet
-    const uint8_t* it = this->buffer.data();
-
-    while(size > 0)
-    {
-        ssize_t sent = ::send(this->fd, it, size, flags);
-        if(sent == -1)
-        {
-            if(errno != EWOULDBLOCK && errno != EAGAIN)
-                throw SendError();
-        }
-        else
-        {
-            it += sent;
-            size -= sent;
-        }
-    }
+    this->sendSize(size, flags);
+    return this->sendUnprocessed(this->buffer.data(), this->buffer.size(), flags);
 }
-std::size_t Socket::recv(void* buffer, std::size_t size, int flags)
+std::size_t Socket::recv(void* data, std::size_t size, int flags)
 {
-    if(buffer == nullptr || size == 0)
+    if(size == 0)
         return 0;
 
-    // Receive the size of the content and packet
-    const std::size_t size_content = this->recvSize();
-    const std::size_t size_packet = this->recvSize();
-
-    if(size_content > size)
+    const std::size_t content_size = this->recvSize(flags);
+    if(content_size > size)
         throw ReceiveError();
 
-    // Receive the packet
-    this->buffer.resize(size_packet);
-    uint8_t* it = this->buffer.data();
-    size = size_packet;
-
-    while(size > 0)
-    {
-        ssize_t received = ::recv(this->fd, it, size, flags);
-        if(received == -1)
-        {
-            if(errno != EWOULDBLOCK && errno != EAGAIN)
-                throw ReceiveError();
-        }
-        else
-        {
-            it += received;
-            size -= received;
-        }
-    }
-
-    this->onReceive(reinterpret_cast<uint8_t*>(buffer), size_packet);
-    return size_content;
+    this->recvUnprocessed(this->buffer, flags);
+    this->onReceive(reinterpret_cast<uint8_t*>(data), this->buffer.size());
+    return content_size;
 }
 
 
@@ -272,29 +255,19 @@ uint32_t Socket::recv32(int flags)
     this->recv(&buffer, sizeof(buffer), flags);
     return ntoh(buffer);
 }
-std::size_t Socket::recvString(char* buffer, std::size_t size, int flags)
+std::size_t Socket::recvString(char* data, std::size_t size, int flags)
 {
-    const uint32_t length = this->recv32(flags);
+    const std::size_t length = this->recvSize(flags);
+    if(length > size - 1)
+        throw ReceiveError();
 
-    uint32_t receive_length = length;
-    if(size > 0 && receive_length > size - 1)
-        receive_length = static_cast<uint32_t>(size - 1);
-
-    this->recv(buffer, receive_length, flags);
-    buffer[receive_length] = '\0';
-    return length - receive_length;
+    this->recv(data, length, flags);
+    data[length] = '\0';
+    return length;
 }
-std::size_t Socket::recvString(std::string& buffer, std::size_t size, int flags)
+std::size_t Socket::recvString(std::string& data, int flags)
 {
-    const uint32_t length = this->recv32(flags);
-
-    uint32_t receive_length = length;
-    if(size > 0 && receive_length > size - 1)
-        receive_length = static_cast<uint32_t>(size - 1);
-
-    buffer.resize(receive_length);
-    this->recv(const_cast<char*>(buffer.c_str()), receive_length, flags);
-    return length - receive_length;
+    return this->recv(data, flags);
 }
 
 

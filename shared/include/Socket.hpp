@@ -77,11 +77,12 @@ public:
     bool accept(IpAddress& address, uint16_t& port, Socket& sock);
     bool connect(IpAddress address, uint16_t port);
 
-    void sendSize(std::size_t data, int flags = 0);
-    std::size_t recvSize(int flags = 0);
 
+
+    void sendRaw(const void* data, std::size_t size, int flags = 0);
+    void sendSize(std::size_t data, int flags = 0);
+    void sendUnprocessed(const void* data, std::size_t size, int flags = 0);
     void send(const void* data, std::size_t size, int flags = 0);
-    std::size_t recv(void* buffer, std::size_t size, int flags = 0);
 
     void send8(uint8_t data, int flags = 0);
     void send16(uint16_t data, int flags = 0);
@@ -89,11 +90,30 @@ public:
     void sendString(const char* data, std::size_t length = 0, int flags = 0);
     void sendString(const std::string& data, int flags = 0);
 
-    uint8_t recv8(int flags = 0);
-    uint16_t recv16(int flags = 0);
-    uint32_t recv32(int flags = 0);
-    std::size_t recvString(char* buffer, std::size_t size = 0, int flags = 0);
-    std::size_t recvString(std::string& buffer, std::size_t size = 0, int flags = 0);
+
+
+    void        recvRaw(void* data, std::size_t size, int flags = 0);
+    std::size_t recvSize(int flags = 0);
+    std::size_t recvUnprocessed(void* data, std::size_t size, int flags = 0);
+    std::size_t recv(void* data, std::size_t size, int flags = 0);
+
+    uint8_t     recv8(int flags = 0);
+    uint16_t    recv16(int flags = 0);
+    uint32_t    recv32(int flags = 0);
+    std::size_t recvString(char* data, std::size_t size = 0, int flags = 0);
+    std::size_t recvString(std::string& data, int flags = 0);
+
+
+
+    template <typename Container>
+    void sendUnprocessed(const Container& container, int flags = 0);
+    template <typename Container>
+    void send(const Container& container, int flags = 0);
+
+    template <typename Container>
+    std::size_t recvUnprocessed(Container& container, int flags = 0);
+    template <typename Container>
+    std::size_t recv(Container& container, int flags = 0);
 
 protected:
     virtual void onSend(const uint8_t* data, std::size_t size);
@@ -110,6 +130,45 @@ protected:
 
 
 
+template <typename Container>
+void Socket::sendUnprocessed(const Container& container, int flags)
+{
+    return this->sendUnprocessed(container.data(), container.size(), flags);
+}
+
+template <typename Container>
+void Socket::send(const Container& container, int flags)
+{
+    return this->send(container.data(), container.size(), flags);
+}
+
+
+
+template <typename Container>
+std::size_t Socket::recvUnprocessed(Container& container, int flags)
+{
+    const std::size_t packet_size = this->recvSize(flags);
+    container.resize(packet_size);
+    this->recvRaw((void*)(container.data()), packet_size, flags);
+    return packet_size;
+}
+
+template <typename Container>
+std::size_t Socket::recv(Container& container, int flags)
+{
+    const std::size_t content_size = this->recvSize(flags);
+    container.resize(content_size);
+
+    this->recvUnprocessed(this->buffer, flags);
+    this->onReceive((uint8_t*)(container.data()), container.size());
+    return content_size;
+}
+
+
+
+
+
+// Non-member
 template <typename T>
 T ntoh(T x)
 {

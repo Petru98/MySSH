@@ -200,6 +200,8 @@ bool Server::handleClientInit(Client& client)
     std::size_t size;
 
     // TODO: Public key exchange
+    client.sock.recv(buffer);
+
 
     // Username
     size = client.sock.recvString(buffer);

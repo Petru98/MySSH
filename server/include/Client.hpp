@@ -4,6 +4,7 @@
 #include <PgpSocket.hpp>
 #include <Mutex.hpp>
 #include <Pipe.hpp>
+#include <cryptopp/rsa.h>
 
 
 
@@ -25,6 +26,7 @@ public:
 
 public:
     Mutex mutex;
+    CryptoPP::RSA::PublicKey key;
     Pipe pipe;
     PgpSocket sock;
     IpAddress ip;
