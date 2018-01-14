@@ -40,12 +40,17 @@ void Server::init(int argc, char** argv)
 
     if(xmlerr == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
     {
+        tinyxml2::XMLElement* xml = this->database.NewElement("xml");
+        if(xml == nullptr)
+            throw std::runtime_error(this->database.ErrorStr());
         tinyxml2::XMLElement* users = this->database.NewElement("users");
         if(users == nullptr)
             throw std::runtime_error(this->database.ErrorStr());
-        if(this->database.InsertEndChild(users) == nullptr)
+
+        if(xml->InsertEndChild(users) == nullptr)
         {
             this->database.DeleteNode(users);
+            this->database.DeleteNode(xml);
             throw std::runtime_error(this->database.ErrorStr());
         }
     }
@@ -407,7 +412,9 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
 
 void Server::addUser(const std::string& name, const std::string& password)
 {
-    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
+    tinyxml2::XMLElement* xml = this->database.RootElement();
+    assert(xml != nullptr);
+    tinyxml2::XMLElement* users = xml->FirstChildElement("users");
     assert(users != nullptr);
 
 
@@ -452,7 +459,9 @@ void Server::addUser(const std::string& name, const std::string& password)
 
 tinyxml2::XMLElement* Server::findUser(const char* name)
 {
-    tinyxml2::XMLElement* users = this->database.FirstChildElement("users");
+    tinyxml2::XMLElement* xml = this->database.RootElement();
+    assert(xml != nullptr);
+    tinyxml2::XMLElement* users = xml->FirstChildElement("users");
     assert(users != nullptr);
 
     tinyxml2::XMLElement* user = users->FirstChildElement("user");
