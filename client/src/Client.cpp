@@ -111,7 +111,10 @@ void Client::loop()
             this->server.sock.recv(prompt);
             std::cout << prompt;
 
-            if(!std::getline(std::cin, buffer))
+            while(std::getline(std::cin, buffer) && buffer.size() == 0)
+                std::cout << prompt;
+
+            if(!std::cin)
                 must_exit = true;
             else
             {
@@ -122,6 +125,7 @@ void Client::loop()
                 {
                     this->server.sock.recv(buffer);
                     std::cout << buffer;
+                    response = this->server.sock.recv8();
                 }
 
                 if(response == 255)

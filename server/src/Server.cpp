@@ -166,11 +166,7 @@ void Server::handleClient(std::size_t index)
                     must_exit = this->executeServerCommand(client) == false;
 
                 // Communication with the client
-                if(must_exit == true)
-                {
-                    client.sock.send8(255);
-                }
-                else if(FD_ISSET(client.sock.getFD(), &fdset))
+                if(must_exit == false && FD_ISSET(client.sock.getFD(), &fdset))
                 {
                     client.sock.recvString(buffer);
                     CommandTree(buffer).execute(&Server::executeClientCommand, this, index);
@@ -183,15 +179,10 @@ void Server::handleClient(std::size_t index)
         {
             must_exit = true;
         }
-        catch(Socket::ReceiveError& e)
+        catch(Socket::Error& e)
         {
             error(e.what());
-            must_exit = true;
-        }
-        catch(Socket::SendError& e)
-        {
-            error(e.what());
-            must_exit = true;
+            break;
         }
         catch(std::exception& e)
         {
@@ -200,8 +191,11 @@ void Server::handleClient(std::size_t index)
         catch(...)
         {
             error("unknown exception caught in 'Server::handleClient'");
-            must_exit = true;
+            break;
         }
+
+        if(must_exit == true)
+            client.sock.send8(255);
     }
 
     client.sock.close();
@@ -267,6 +261,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
 
     Client& client = (*this->clients[index]);
     int exit_code = 0;
+    Pipe pipe;
     pid_t pid = fork();
 
     if(pid == -1)
@@ -278,6 +273,8 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
     }
     else if(pid == 0)
     {
+        ::close(pipe.getReadFD());
+
         int argc = static_cast<int>(cmd.size());
         char** argv = nullptr;
 
@@ -294,42 +291,60 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
         }
         catch(...)
         {
-            exit(-1);
+            exit(255);
         }
 
-        if(stdinfd != STDIN_FILENO)
+
+
+        auto replace_fd = [](int to_replace, int main_replacement, int alternative_replacement)
         {
-            ::close(STDIN_FILENO);
-            if(dup2(stdinfd, STDIN_FILENO) == -1)
-                exit(errno);
-        }
-        if(stdoutfd != STDIN_FILENO)
-        {
-            ::close(STDOUT_FILENO);
-            if(dup2(stdoutfd, STDOUT_FILENO) == -1)
-                exit(errno);
-        }
-        if(stderrfd != STDERR_FILENO)
-        {
-            ::close(STDIN_FILENO);
-            if(dup2(stderrfd, STDERR_FILENO) == -1)
-                exit(errno);
-        }
+            int replacement = to_replace;
+
+            if(main_replacement != to_replace)
+                replacement = main_replacement;
+            else if(alternative_replacement != to_replace)
+                replacement = alternative_replacement;
+
+            if(replacement != to_replace)
+            {
+                if(dup2(replacement, to_replace) == -1)
+                    exit(255);
+            }
+        };
+
+        replace_fd(STDIN_FILENO , stdinfd , stdinfd);
+        replace_fd(STDOUT_FILENO, stdoutfd, pipe.getWriteFD());
+        replace_fd(STDERR_FILENO, stderrfd, pipe.getWriteFD());
 
         execvp(argv[0], argv);
-        exit(errno);
+        exit(255);
     }
     else
     {
         if(async == false)
         {
+            ::close(pipe.getWriteFD());
+
+            std::string buffer;
+            std::size_t size;
+            constexpr std::size_t max_buffer_size = 8192;
+            buffer.resize(max_buffer_size);
+
+            while((size = pipe.read(&buffer[0], max_buffer_size)) > 0)
+            {
+                buffer.resize(size);
+                client.sock.send8(1);
+                client.sock.send(buffer);
+                buffer.resize(max_buffer_size);
+            }
+
             int status;
             waitpid(pid, &status, 0);
 
             if(WIFEXITED(status))
             {
                 exit_code = WEXITSTATUS(status);
-                if(exit_code != 0)
+                if(exit_code == 255)
                 {
                     constexpr char msg[] = "server: executable not found, permission denied or internal error";
                     client.sock.send8(1);
