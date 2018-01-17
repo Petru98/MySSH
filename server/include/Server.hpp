@@ -23,8 +23,6 @@ private:
 
 
 
-    void setClientCWD(std::size_t index, const std::string& dir);
-
     void initializeOptions();
 
     void init(int argc, char** argv);
@@ -34,6 +32,7 @@ private:
     void handleClient(std::size_t index);
     bool handleClientInit(Client& client);
     int  executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
+    void setClientCWD(std::size_t index, const std::string& dir);
 
     void loopInterface();
     bool executeServerCommand(Client& client);

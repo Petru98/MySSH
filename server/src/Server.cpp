@@ -248,7 +248,7 @@ void Server::handleClient(std::size_t index)
                 if(must_exit == false && FD_ISSET(client.sock.getFD(), &fdset))
                 {
                     client.sock.recvString(buffer);
-                    CommandTree(buffer).execute(&Server::executeClientCommand, this, index);
+                    CommandTree(buffer, client.home).execute(&Server::executeClientCommand, this, index);
 
                     client.sock.send8(0);
                 }
@@ -376,7 +376,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
     }
 
     int exit_code = 0;
-    Pipe pipe;
+    Pipe pipe(O_CLOEXEC);
     pid_t pid = fork();
 
     if(pid == -1)
@@ -389,6 +389,14 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
     else if(pid == 0)
     {
         ::close(pipe.getReadFD());
+        if(async == true)
+            ::close(pipe.getWriteFD());
+
+        auto exit_with_error = [&pipe](const char* msg, std::size_t length = 0)
+        {
+            pipe.write(msg, (length > 0 ? length : strlen(msg)));
+            exit(255);
+        };
 
         int argc = static_cast<int>(cmd.size());
         char** argv = nullptr;
@@ -406,12 +414,12 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
         }
         catch(...)
         {
-            exit(255);
+            exit_with_error("server: not enough memory\n");
         }
 
 
 
-        auto replace_fd = [](int to_replace, int main_replacement, int alternative_replacement)
+        auto replace_fd = [&exit_with_error](int to_replace, int main_replacement, int alternative_replacement)
         {
             int replacement = to_replace;
 
@@ -423,7 +431,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
             if(replacement != to_replace)
             {
                 if(dup2(replacement, to_replace) == -1)
-                    exit(255);
+                    exit_with_error("server: could not dup\n");
             }
         };
 
@@ -432,10 +440,10 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
         replace_fd(STDERR_FILENO, stderrfd, pipe.getWriteFD());
 
         if(chdir((client.home + client.cwd).c_str()) == -1)
-            exit(255);
+            exit_with_error("server: could not set working directory\n");
 
         execvp(argv[0], argv);
-        exit(255);
+        exit_with_error("server: executable not found\n");
     }
     else
     {
@@ -460,15 +468,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
             waitpid(pid, &status, 0);
 
             if(WIFEXITED(status))
-            {
                 exit_code = WEXITSTATUS(status);
-                if(exit_code == 255)
-                {
-                    constexpr char msg[] = "server: executable not found, permission denied or internal error\n";
-                    client.sock.send8(1);
-                    client.sock.sendString(msg, sizeof(msg) - 1);
-                }
-            }
             else
                 exit_code = -1;
         }
@@ -538,7 +538,7 @@ bool Server::executeServerCommand(Client& client)
 
     switch(code)
     {
-    case 0: return false;
+    case 0: client.sock.send8(-1); return false;
     }
 
     return true;

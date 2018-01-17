@@ -49,10 +49,13 @@ private:
         bool isOperand() const;
     };
 
+
+
 public:
     CommandTree();
-    CommandTree(const char* cmd);
-    CommandTree(const std::string& cmd);
+    CommandTree(const char* cmd, const char* cwd = ".");
+    CommandTree(const std::string& cmd, const std::string& cwd);
+    CommandTree(const std::string& cmd, std::string&& cwd = ".");
     ~CommandTree();
 
     CommandTree& parse(const char* cmd);
@@ -62,6 +65,10 @@ public:
     int execute(F&& func, Args&&... args) const;
 
     void clear();
+    void setCWD(const char* cwd);
+    void setCWD(const std::string& cwd);
+    void setCWD(std::string&& cwd);
+
     std::size_t getSize() const;
 
 private:
@@ -83,6 +90,7 @@ private:
 
 private:
     Node* root;
+    std::string cwd;
     std::size_t size;
 };
 

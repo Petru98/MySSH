@@ -19,13 +19,17 @@ bool CommandTree::Node::isOperand() const
 
 
 // CommandTree
-CommandTree::CommandTree() : root(nullptr), size(0)
+CommandTree::CommandTree() : root(nullptr), cwd("."), size(0)
 {}
-CommandTree::CommandTree(const char* cmd) : root(nullptr), size(0)
+CommandTree::CommandTree(const char* cmd, const char* cwd) : root(nullptr), cwd(cwd), size(0)
 {
     this->parse(cmd);
 }
-CommandTree::CommandTree(const std::string& cmd) : root(nullptr), size(0)
+CommandTree::CommandTree(const std::string& cmd, const std::string& cwd) : root(nullptr), cwd(cwd), size(0)
+{
+    this->parse(cmd);
+}
+CommandTree::CommandTree(const std::string& cmd, std::string&& cwd) : root(nullptr), cwd(std::move(cwd)), size(0)
 {
     this->parse(cmd);
 }
@@ -107,6 +111,21 @@ void CommandTree::clear()
     }
 }
 
+void CommandTree::setCWD(const char* cwd)
+{
+    this->cwd = cwd;
+}
+void CommandTree::setCWD(const std::string& cwd)
+{
+    this->cwd = cwd;
+}
+void CommandTree::setCWD(std::string&& cwd)
+{
+    this->cwd = std::move(cwd);
+}
+
+
+
 std::size_t CommandTree::getSize() const
 {
     return this->size;
@@ -119,6 +138,7 @@ std::size_t CommandTree::getSize() const
 const char* CommandTree::getNextToken(const char* cmd, std::string& token)
 {
     constexpr char delims[] = " \t";
+    token.clear();
 
     while((*cmd) != '\0' && strchr(delims, *cmd) != nullptr)
             ++cmd;
@@ -131,8 +151,9 @@ const char* CommandTree::getNextToken(const char* cmd, std::string& token)
         {
             if((*cmd) == '\"')
                 quotes_open = !quotes_open;
+            else
+                token.push_back(*cmd);
 
-            token.push_back(*cmd);
             ++cmd;
         }
     }
@@ -279,13 +300,14 @@ int CommandTree::executeSubtreeExecute(Node* root, int stdinfd, int stdoutfd, in
     const int stdoutfd_def = stdoutfd;
     const int stderrfd_def = stderrfd;
 
-    auto open_file = [](int fd, const std::string& filename, int mode)
+    auto open_file = [this](int fd, const std::string& filename, int mode)
     {
         if(filename.length() > 0)
         {
-            fd = ::open(filename.c_str(), mode);
+            const std::string path = this->cwd + '/' + filename;
+            fd = ::open(path.c_str(), mode);
             if(fd == -1)
-                throw std::runtime_error("could not open file " + filename);
+                throw std::runtime_error("could not open file " + path);
         }
         return fd;
     };
@@ -351,9 +373,10 @@ int CommandTree::executeSubtreeOr(Node* root, int stdinfd, int stdoutfd, int std
 
 int CommandTree::executeSubtreePipe(Node* root, int stdinfd, int stdoutfd, int stderrfd, std::function<callback_t>& callback) const
 {
-    ((void)stdoutfd);
+    ((void)stdoutfd); ((void)stderrfd);
 
-    Pipe pipe;
-    this->executeSubtreeExecute(root->left, stdinfd, pipe.getWriteFD(), stderrfd, true, callback);
+    Pipe pipe(O_CLOEXEC);
+    this->executeSubtreeExecute(root->left, stdinfd, pipe.getWriteFD(), pipe.getWriteFD(), true, callback);
+    ::close(pipe.getWriteFD());
     return this->executeSubtree(root->right, pipe.getReadFD(), STDOUT_FILENO, STDERR_FILENO, callback);
 }
