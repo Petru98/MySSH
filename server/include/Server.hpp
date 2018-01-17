@@ -23,6 +23,8 @@ private:
 
 
 
+    void setClientCWD(std::size_t index, const std::string& dir);
+
     void initializeOptions();
 
     void init(int argc, char** argv);
@@ -54,6 +56,8 @@ private:
 
     std::vector<Thread*> handlers;
     std::vector<Client*> clients;
+    std::string home_dir;
+    std::string cwd;
     Mutex mutex;
 };
 

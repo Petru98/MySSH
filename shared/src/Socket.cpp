@@ -240,14 +240,11 @@ void Socket::send32(uint32_t data, int flags)
 }
 void Socket::sendString(const char* data, std::size_t length, int flags)
 {
-    if(data == nullptr || (*data) == '\0')
-        return;
+    if(data == nullptr)
+        throw std::logic_error("cannot send nullptr string");
     if(length == 0)
         length = strlen(data);
-    if(length > std::numeric_limits<uint32_t>::max())
-        throw std::runtime_error("could not send string because it is too big");
 
-    this->send32(static_cast<uint32_t>(length), flags);
     this->send(data, length, flags);
 }
 void Socket::sendString(const std::string& data, int flags)
@@ -275,13 +272,9 @@ uint32_t Socket::recv32(int flags)
 }
 std::size_t Socket::recvString(char* data, std::size_t size, int flags)
 {
-    const std::size_t length = this->recvSize(flags);
-    if(length > size - 1)
-        throw ReceiveError();
-
-    this->recv(data, length, flags);
-    data[length] = '\0';
-    return length;
+    this->recv(data, size - 1, flags);
+    data[size] = '\0';
+    return size;
 }
 std::size_t Socket::recvString(std::string& data, int flags)
 {

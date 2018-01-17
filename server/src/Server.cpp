@@ -7,6 +7,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 #include <cryptopp/osrng.h>
 #include <cryptopp/hex.h>
 
@@ -19,9 +20,71 @@ Server::Server()
     CryptoPP::AutoSeededRandomPool rng;
     this->privatekey.GenerateRandomWithKeySize(rng, pgp::RSA_KEY_SIZE);
     this->publickey = this->privatekey;
+
+    this->home_dir = "home";
 }
 Server::~Server()
 {}
+
+
+
+void Server::setClientCWD(std::size_t index, const std::string& dir)
+{
+    Client& client = (*this->clients[index]);
+    std::string abs_path;
+
+    if(dir[0] == '/')
+        abs_path = dir;
+    else
+    {
+        abs_path = client.cwd;
+        auto token_begin = dir.begin();
+
+        while(token_begin < dir.end())
+        {
+            auto token_end = token_begin;
+            while(token_end != dir.end() && (*token_end) != '/')
+                ++token_end;
+
+            if(token_end != token_begin)
+            {
+                const std::string token(token_begin, token_end);
+
+                if(token == ".")
+                    {}
+                else if(token == "..")
+                {
+                    if(abs_path.size() > 1)
+                    {
+                        const auto pos = abs_path.find_last_of('/');
+
+                        if(pos == 0 || pos == std::string::npos)
+                            abs_path = "/";
+                        else
+                            abs_path.resize(pos);
+                    }
+                }
+                else
+                {
+                    if(abs_path.size() > 1)
+                        abs_path += '/';
+                    abs_path += token;
+                }
+            }
+
+            token_begin = token_end + 1;
+        }
+    }
+
+    struct stat info;
+    if(stat((client.home + abs_path).c_str(), &info) == -1)
+        throw std::runtime_error(strerror_r(errno, client.errmsg, client.ERRMSG_MAX_SIZE));
+
+    if(!S_ISDIR(info.st_mode))
+        throw std::runtime_error("not a directory");
+
+    client.cwd = abs_path;
+}
 
 
 
@@ -35,7 +98,10 @@ void Server::initializeOptions()
 
 void Server::init(int argc, char** argv)
 {
+    // Options
     this->options.parse(argc, argv);
+
+    // Databse
     tinyxml2::XMLError xmlerr = this->database.LoadFile(this->options.findOption("database").c_str());
 
     if(xmlerr == tinyxml2::XML_ERROR_FILE_NOT_FOUND)
@@ -57,10 +123,18 @@ void Server::init(int argc, char** argv)
     else if(xmlerr != tinyxml2::XML_SUCCESS)
         throw std::runtime_error(this->database.ErrorStr());
 
+    // Create home directory for users
+    if(mkdir(this->home_dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1 && errno != EEXIST)
+        throw std::runtime_error("could not create 'home' directory");
+
+    // Listener
     int port = std::stoi(this->options.findOption("port"));
     if(port < 0 || port > 65535)
         throw std::runtime_error("invalid port");
+
     this->listener.create(Socket::Tcp, Socket::INet, SOCK_CLOEXEC);
+    const int reuse_addr = 1;
+    setsockopt(this->listener.getFD(), SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
     this->listener.bind(port);
     this->listener.listen();
 }
@@ -142,7 +216,7 @@ void Server::handleClient(std::size_t index)
         return;
 
     // Loop
-    std::string prompt = "$ ";
+    std::string prompt;
     std::string buffer;
     bool must_exit = false;
 
@@ -150,19 +224,24 @@ void Server::handleClient(std::size_t index)
     {
         try
         {
+            prompt.clear();
+            prompt += client.name;
+            prompt += ':';
+            prompt += client.cwd;
+            prompt += "$ ";
             client.sock.send(prompt);
 
             fd_set fdset;
             FD_ZERO(&fdset);
             FD_SET(client.sock.getFD(), &fdset);
-            FD_SET(client.pipe.getReadFD(), &fdset);
+            FD_SET(client.server_pipe.getReadFD(), &fdset);
 
-            if(select(std::max(client.sock.getFD(), client.pipe.getReadFD()) + 1, &fdset, nullptr, nullptr, nullptr) > 0)
+            if(select(std::max(client.sock.getFD(), client.server_pipe.getReadFD()) + 1, &fdset, nullptr, nullptr, nullptr) > 0)
             {
                 Lock(client.mutex);
 
                 // Command from server thread
-                if(FD_ISSET(client.pipe.getReadFD(), &fdset))
+                if(FD_ISSET(client.server_pipe.getReadFD(), &fdset))
                     must_exit = this->executeServerCommand(client) == false;
 
                 // Communication with the client
@@ -226,6 +305,8 @@ bool Server::handleClientInit(Client& client)
         return false;
     }
 
+    client.name = std::move(buffer);
+    client.home = this->home_dir + '/' + client.name;
     client.sock.send8(1);
 
     // Password
@@ -256,17 +337,51 @@ bool Server::handleClientInit(Client& client)
 
 int Server::executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
 {
+    Client& client = (*this->clients[index]);
+    Lock(this->mutex);
+    Lock(client.mutex);
+
     if(cmd[0] == "exit")
         throw ExitEvent();
 
-    Client& client = (*this->clients[index]);
+    if(cmd[0] == "cd")
+    {
+        if(cmd.size() == 1)
+            client.cwd = '/';
+        else if(cmd.size() == 2)
+        {
+            try
+            {
+                this->setClientCWD(index, cmd[1]);
+            }
+            catch(std::exception& e)
+            {
+                client.sock.send8(1);
+                client.sock.sendString("server: ");
+                client.sock.send8(1);
+                client.sock.sendString(e.what());
+                client.sock.send8(1);
+                client.sock.sendString("\n");
+                return 1;
+            }
+        }
+        else
+        {
+            client.sock.send8(1);
+            client.sock.sendString("server: invalid number of arguments\n");
+            return 2;
+        }
+
+        return 0;
+    }
+
     int exit_code = 0;
     Pipe pipe;
     pid_t pid = fork();
 
     if(pid == -1)
     {
-        constexpr char msg[] = "server: internal error";
+        constexpr char msg[] = "server: internal error\n";
         client.sock.send8(1);
         client.sock.sendString(msg, sizeof(msg) - 1);
         exit_code = -1;
@@ -316,6 +431,9 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
         replace_fd(STDOUT_FILENO, stdoutfd, pipe.getWriteFD());
         replace_fd(STDERR_FILENO, stderrfd, pipe.getWriteFD());
 
+        if(chdir((client.home + client.cwd).c_str()) == -1)
+            exit(255);
+
         execvp(argv[0], argv);
         exit(255);
     }
@@ -346,7 +464,7 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
                 exit_code = WEXITSTATUS(status);
                 if(exit_code == 255)
                 {
-                    constexpr char msg[] = "server: executable not found, permission denied or internal error";
+                    constexpr char msg[] = "server: executable not found, permission denied or internal error\n";
                     client.sock.send8(1);
                     client.sock.sendString(msg, sizeof(msg) - 1);
                 }
@@ -416,7 +534,7 @@ bool Server::executeServerCommand(Client& client)
 {
 
     uint8_t code;
-    client.pipe.read(&code, sizeof(code));
+    client.server_pipe.read(&code, sizeof(code));
 
     switch(code)
     {
@@ -534,6 +652,9 @@ void Server::addUser(const std::string& name, const std::string& password)
 
     if(this->database.SaveFile(this->options.findOption("database").c_str()) != tinyxml2::XML_SUCCESS)
         throw std::runtime_error(this->database.ErrorStr());
+
+    if(mkdir((this->home_dir + '/' + name).c_str(), S_IRWXU | S_IRGRP) == -1)
+        throw std::runtime_error("could not create user directory");
 }
 
 void Server::removeUser(const std::string& name)

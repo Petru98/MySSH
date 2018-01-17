@@ -27,10 +27,17 @@ public:
 public:
     Mutex mutex;
     CryptoPP::RSA::PublicKey publickey;
-    Pipe pipe;
+    std::string name;
+    std::string home;
+    std::string cwd;
+
+    Pipe server_pipe;
     PgpSocket sock;
     IpAddress ip;
     uint16_t port;
+
+    static constexpr std::size_t ERRMSG_MAX_SIZE = 256;
+    char errmsg[ERRMSG_MAX_SIZE];
 };
 
 #endif

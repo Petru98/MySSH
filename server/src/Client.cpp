@@ -6,7 +6,12 @@
 
 
 
-Client::Client(PgpSocket&& sock, IpAddress ip, uint16_t port) : mutex(), publickey(), pipe(), sock(std::move(sock)), ip(ip), port(port)
+constexpr std::size_t Client::ERRMSG_MAX_SIZE;
+
+
+
+Client::Client(PgpSocket&& sock, IpAddress ip, uint16_t port)
+    : mutex(), publickey(), name(), home(), cwd("/"), server_pipe(), sock(std::move(sock)), ip(ip), port(port)
 {}
 Client::~Client()
 {
@@ -22,7 +27,7 @@ void Client::disconnect()
     if(this->sock.isValid())
     {
         uint8_t code = 0;
-        this->pipe.write(&code, sizeof(code));
+        this->server_pipe.write(&code, sizeof(code));
     }
 }
 
