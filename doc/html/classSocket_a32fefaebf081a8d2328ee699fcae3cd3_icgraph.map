@@ -1,0 +1,9 @@
+<map id="Socket::recvUnprocessed" name="Socket::recvUnprocessed">
+<area shape="rect" id="node2" href="$classClient.html#ab5a45e6a2958400467102348869b650c" title="Client::init" alt="" coords="265,5,347,32"/>
+<area shape="rect" id="node4" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="227,56,385,83"/>
+<area shape="rect" id="node8" href="$classSocket.html#a6d9579a97d65a8ed966e79196e1d7b35" title="Socket::recv" alt="" coords="258,107,354,133"/>
+<area shape="rect" id="node3" href="$classClient.html#a4b58c2aaefda7db6e866074762d4ff8e" title="Client::run" alt="" coords="462,5,545,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="433,56,573,83"/>
+<area shape="rect" id="node6" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="621,56,785,83"/>
+<area shape="rect" id="node7" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="833,56,920,83"/>
+</map>

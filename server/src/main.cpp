@@ -1,8 +1,9 @@
 #include <Server.hpp>
 #include <Logging.hpp>
+#include <memory>
 #include <iostream>
 
-#include <unistd.h>
+
 
 int main(int argc, char** argv)
 {
@@ -10,7 +11,7 @@ int main(int argc, char** argv)
 
     try
     {
-        Server* server = new Server();
+        std::unique_ptr<Server> server(new Server());
         server->run(argc, argv);
     }
     catch(std::exception& e)
@@ -19,7 +20,7 @@ int main(int argc, char** argv)
     }
     catch(...)
     {
-        error("unknown error caught in 'main'");
+        error("unknown exception caught in 'main'");
     }
 
     return 0;

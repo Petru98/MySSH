@@ -2,48 +2,25 @@
 #define INCLUDED_FILEDESCRIPTOR_HPP
 
 #include <cstdint>
-#include <stdexcept>
+#include <system_error>
 
 
 
 class FileDescriptor
 {
 public:
-    class Error : std::exception
+    class Error : public std::system_error
     {
     public:
-        Error() : error(0) {}
-        Error(int error) : error(error) {}
-
-    protected:
-        int error;
+        using std::system_error::system_error;
+        Error(const char* what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(const std::string& what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(int code, const char* what_arg) : std::system_error(code, std::system_category(), what_arg) {};
+        Error(int code, const std::string& what_arg) : std::system_error(code, std::system_category(), what_arg) {};
     };
 
-    class ReadError : public Error
-    {
-    public:
-        ReadError() : Error(), buffer(nullptr), size(0) {}
-        ReadError(int error, void* buffer, std::size_t size) : Error(error), buffer(buffer), size(size) {}
-
-        const char* what() {return "could not read from file descriptor";}
-
-    protected:
-        void* buffer;
-        std::size_t size;
-    };
-
-    class WriteError : public Error
-    {
-    public:
-        WriteError() : Error(), buffer(nullptr), size(0) {}
-        WriteError(int error, const void* buffer, std::size_t size) : Error(error), buffer(buffer), size(size) {}
-
-        const char* what() {return "could not write to file descriptor";}
-
-    protected:
-        const void* buffer;
-        std::size_t size;
-    };
+    class ReadError  : public Error {public: using Error::Error;};
+    class WriteError : public Error {public: using Error::Error;};
 
 
 
@@ -66,3 +43,12 @@ protected:
 };
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class FileDescriptor
+/// \ingroup shared
+////////////////////////////////////////////////////////////////////////////////

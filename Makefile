@@ -22,11 +22,11 @@ DOCDIR := doc
 ################################################################
 # Build targets
 all: server client $(DOCDIR)
-release: server-release client-release $(DOCDIR)
-debug: server-debug client-debug
-
 server: server-release
 client: client-release
+
+release: server-release client-release
+debug: server-debug client-debug
 
 server-release: $(SERVERNAME)
 client-release: $(CLIENTNAME)
@@ -70,9 +70,12 @@ $(SHAREDDIR):
 
 # Build documentation
 $(DOCDIR): Doxyfile \
-     $(wildcard $(SERVERDIR)/include/*.hpp) $(wildcard $(SERVERDIR)/include/*.h) \
-     $(wildcard $(CLIENTDIR)/include/*.hpp) $(wildcard $(CLIENTDIR)/include/*.h) \
-     $(wildcard $(SHAREDDIR)/include/*.hpp) $(wildcard $(SHAREDDIR)/include/*.h)
+     $(wildcard $(SERVERDIR)/include/*.hpp) \
+     $(wildcard $(CLIENTDIR)/include/*.hpp) \
+     $(wildcard $(SHAREDDIR)/include/*.hpp) \
+     $(wildcard $(SERVERDIR)/include/*.cpp) \
+     $(wildcard $(CLIENTDIR)/include/*.cpp) \
+     $(wildcard $(SHAREDDIR)/include/*.cpp)
 	@$(RM) -r $(DOCDIR) \
 	;doxygen Doxyfile
 
@@ -87,11 +90,11 @@ clean-debug:clean-server-debug clean-client-debug
 
 
 clean-server:
-	@$(RM) $(SERVERNAME) \
+	@$(RM) $(SERVERNAME) $(SERVERNAME)-d \
 	;$(MAKE) -C $(SERVERDIR) clean
 
 clean-client:
-	@$(RM) $(CLIENTNAME) \
+	@$(RM) $(CLIENTNAME) $(CLIENTNAME)-d \
 	;$(MAKE) -C $(CLIENTDIR) clean
 
 
@@ -107,11 +110,11 @@ clean-client-release:
 
 
 clean-server-debug:
-	@$(RM) $(SERVERNAME) \
+	@$(RM) $(SERVERNAME)-d \
 	;$(MAKE) -C $(SERVERDIR) clean-debug
 
 clean-client-debug:
-	@$(RM) $(CLIENTNAME) \
+	@$(RM) $(CLIENTNAME)-d \
 	;$(MAKE) -C $(CLIENTDIR) clean-debug
 
 
@@ -127,6 +130,15 @@ clean-doc:
 # Print variable
 print-%:
 	@echo $($*)
+
+
+
+# Create zip file
+zip:
+	@zip -r myssh Makefile Doxyfile README.md doc \
+		client/Makefile client/include client/src \
+		server/Makefile server/include server/src \
+		shared/Makefile shared/include shared/src
 
 
 

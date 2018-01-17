@@ -1,0 +1,8 @@
+<map id="Socket::recv16" name="Socket::recv16">
+<area shape="rect" id="node2" href="$classSocket.html#af6691954be5b07b31eedf6ccb0470c64" title="Socket::recv" alt="" coords="164,92,260,119"/>
+<area shape="rect" id="node5" href="$group__shared.html#ga19a2e93d6405cd94a9178a57c37ada8e" title="ntoh" alt="" coords="738,143,785,170"/>
+<area shape="rect" id="node3" href="$classSocket.html#ac31e20c2da76a84189bd9b22531d7d23" title="Socket::recvSize" alt="" coords="529,92,652,119"/>
+<area shape="rect" id="node6" href="$classSocket.html#a32fefaebf081a8d2328ee699fcae3cd3" title="Socket::recvUnprocessed" alt="" coords="308,42,481,68"/>
+<area shape="rect" id="node7" href="$classSocket.html#a85891828304dd63c7003cc6bae346dd3" title="Socket::onReceive" alt="" coords="328,143,461,170"/>
+<area shape="rect" id="node4" href="$classSocket.html#abc462735f57e2675b03b8b439b6c37ed" title="Socket::recvRaw" alt="" coords="700,42,823,68"/>
+</map>

@@ -1,7 +1,7 @@
 #ifndef INCLUDED_SERVER_HPP
 #define INCLUDED_SERVER_HPP
 
-#include <Client.hpp>
+#include <ClientInfo.hpp>
 #include <CommandLine.hpp>
 #include <Thread.hpp>
 #include <tinyxml2.h>
@@ -30,12 +30,12 @@ private:
 
     void loopAcceptConn();
     void handleClient(std::size_t index);
-    bool handleClientInit(Client& client);
+    bool handleClientInit(ClientInfo& client);
     int  executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async);
     void setClientCWD(std::size_t index, const std::string& dir);
 
     void loopInterface();
-    bool executeServerCommand(Client& client);
+    bool executeServerCommand(ClientInfo& client);
     std::vector<std::string> parseCommand(const char* buffer);
 
     tinyxml2::XMLElement* findUser(const char* name);
@@ -54,10 +54,19 @@ private:
     Socket listener;
 
     std::vector<Thread*> handlers;
-    std::vector<Client*> clients;
+    std::vector<ClientInfo*> clients;
     std::string home_dir;
     std::string cwd;
     Mutex mutex;
 };
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class Server
+/// \ingroup server
+////////////////////////////////////////////////////////////////////////////////

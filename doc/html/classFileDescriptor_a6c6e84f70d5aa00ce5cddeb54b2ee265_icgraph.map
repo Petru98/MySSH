@@ -1,0 +1,9 @@
+<map id="FileDescriptor::read" name="FileDescriptor::read">
+<area shape="rect" id="node2" href="$classFileDescriptor.html#a8730006fb0fdc7ef815b8d85594598e6" title="FileDescriptor::readAll" alt="" coords="189,5,340,32"/>
+<area shape="rect" id="node3" href="$classPipe.html#abe4950fad6d80417ac5cb6e80cf87328" title="Pipe::read" alt="" coords="224,56,305,83"/>
+<area shape="rect" id="node4" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="390,31,598,57"/>
+<area shape="rect" id="node8" href="$classServer.html#aea5884a81009bb3f41e6b7a9f15afa6a" title="Server::executeServerCommand" alt="" coords="388,81,600,108"/>
+<area shape="rect" id="node5" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="648,56,788,83"/>
+<area shape="rect" id="node6" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="836,56,1000,83"/>
+<area shape="rect" id="node7" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="1048,56,1135,83"/>
+</map>

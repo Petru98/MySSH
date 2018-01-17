@@ -1,0 +1,10 @@
+<map id="Socket::Error" name="Socket::Error">
+<area shape="rect" id="node3" href="$classSocket_1_1AcceptError.html" title="Socket::AcceptError" alt="" coords="303,5,443,32"/>
+<area shape="rect" id="node4" href="$classSocket_1_1BindError.html" title="Socket::BindError" alt="" coords="310,56,435,83"/>
+<area shape="rect" id="node5" href="$classSocket_1_1ConnectError.html" title="Socket::ConnectError" alt="" coords="299,107,447,133"/>
+<area shape="rect" id="node6" href="$classSocket_1_1CreateError.html" title="Socket::CreateError" alt="" coords="303,157,442,184"/>
+<area shape="rect" id="node7" href="$classSocket_1_1GetPortError.html" title="Socket::GetPortError" alt="" coords="301,208,445,235"/>
+<area shape="rect" id="node8" href="$classSocket_1_1ListenError.html" title="Socket::ListenError" alt="" coords="305,259,440,285"/>
+<area shape="rect" id="node9" href="$classSocket_1_1ReceiveError.html" title="Socket::ReceiveError" alt="" coords="299,309,446,336"/>
+<area shape="rect" id="node10" href="$classSocket_1_1SendError.html" title="Socket::SendError" alt="" coords="308,360,437,387"/>
+</map>

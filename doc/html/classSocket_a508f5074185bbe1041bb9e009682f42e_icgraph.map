@@ -1,0 +1,21 @@
+<map id="Socket::send" name="Socket::send">
+<area shape="rect" id="node2" href="$classClient.html#ab5a45e6a2958400467102348869b650c" title="Client::init" alt="" coords="789,56,871,83"/>
+<area shape="rect" id="node4" href="$classClient.html#adff18efbeb86be1ee27d3562ff00ccc4" title="Client::loop" alt="" coords="345,5,433,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="984,259,1124,285"/>
+<area shape="rect" id="node8" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="726,309,934,336"/>
+<area shape="rect" id="node9" href="$classSocket.html#ad1da97215d36e05e764e46464f9c2e41" title="Socket::send" alt="" coords="166,461,265,488"/>
+<area shape="rect" id="node10" href="$classSocket.html#a9546973e652fe1904ff8a196924dad61" title="Socket::sendRaw" alt="" coords="152,157,279,184"/>
+<area shape="rect" id="node15" href="$classSocket.html#ae11cbe4e96b0b005f534b547c3c3ec50" title="Socket::send8" alt="" coords="535,259,641,285"/>
+<area shape="rect" id="node17" href="$classSocket.html#adc228510af20f2fb657cd9073fe073ad" title="Socket::send16" alt="" coords="159,512,272,539"/>
+<area shape="rect" id="node18" href="$classSocket.html#aa25178317f88708a18cb0c692432c719" title="Socket::send32" alt="" coords="159,563,272,589"/>
+<area shape="rect" id="node19" href="$classSocket.html#a47a942f6eee040f2d610f9b9aacf6afc" title="Socket::sendString" alt="" coords="521,360,655,387"/>
+<area shape="rect" id="node3" href="$classClient.html#a4b58c2aaefda7db6e866074762d4ff8e" title="Client::run" alt="" coords="1013,31,1095,57"/>
+<area shape="rect" id="node6" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="1172,259,1336,285"/>
+<area shape="rect" id="node7" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="1384,259,1471,285"/>
+<area shape="rect" id="node11" href="$classSocket.html#a092f2104d235dbe454a4c9ac862046ce" title="Socket::sendSize" alt="" coords="327,107,452,133"/>
+<area shape="rect" id="node12" href="$classSocket.html#ad1f4905f57f4f870f2ead63c30f35626" title="Socket::sendUnprocessed" alt="" coords="500,132,676,159"/>
+<area shape="rect" id="node13" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="751,157,909,184"/>
+<area shape="rect" id="node14" href="$classSocket.html#a867b7245682c951d99cca2079ae2e2f6" title="Socket::sendUnprocessed" alt="" coords="742,107,918,133"/>
+<area shape="rect" id="node16" href="$classServer.html#aea5884a81009bb3f41e6b7a9f15afa6a" title="Server::executeServerCommand" alt="" coords="724,208,936,235"/>
+<area shape="rect" id="node20" href="$classSocket.html#aa773d0b2990808d7acce1b654e7c374f" title="Socket::sendString" alt="" coords="763,360,897,387"/>
+</map>

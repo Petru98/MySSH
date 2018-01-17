@@ -1,0 +1,8 @@
+<map id="Socket::send16" name="Socket::send16">
+<area shape="rect" id="node2" href="$group__shared.html#gacf439177de6e6a4b67d2b15bb32fca3e" title="hton" alt="" coords="751,20,797,47"/>
+<area shape="rect" id="node3" href="$classSocket.html#a508f5074185bbe1041bb9e009682f42e" title="Socket::send" alt="" coords="167,71,265,98"/>
+<area shape="rect" id="node4" href="$classSocket.html#a61624be4ff53b1cca76b366d3184109c" title="Socket::onSend" alt="" coords="344,20,459,47"/>
+<area shape="rect" id="node5" href="$classSocket.html#a092f2104d235dbe454a4c9ac862046ce" title="Socket::sendSize" alt="" coords="537,71,663,98"/>
+<area shape="rect" id="node7" href="$classSocket.html#ad1f4905f57f4f870f2ead63c30f35626" title="Socket::sendUnprocessed" alt="" coords="313,122,489,148"/>
+<area shape="rect" id="node6" href="$classSocket.html#a9546973e652fe1904ff8a196924dad61" title="Socket::sendRaw" alt="" coords="711,122,837,148"/>
+</map>

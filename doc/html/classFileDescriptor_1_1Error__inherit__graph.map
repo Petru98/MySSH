@@ -1,0 +1,4 @@
+<map id="FileDescriptor::Error" name="FileDescriptor::Error">
+<area shape="rect" id="node3" href="$classFileDescriptor_1_1ReadError.html" title="FileDescriptor::ReadError" alt="" coords="5,155,176,181"/>
+<area shape="rect" id="node4" href="$classFileDescriptor_1_1WriteError.html" title="FileDescriptor::WriteError" alt="" coords="200,155,371,181"/>
+</map>

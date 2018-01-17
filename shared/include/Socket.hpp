@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <string>
 #include <vector>
+#include <system_error>
 #include "IpAddress.hpp"
 #include "FileDescriptor.hpp"
 
@@ -26,46 +27,26 @@ public:
         Udp = SOCK_DGRAM
     };
 
-    enum Flags
+
+
+    class Error : public std::system_error
     {
-        NonBlock = SOCK_NONBLOCK,
-        CloseOnExec = SOCK_CLOEXEC
+    public:
+        using std::system_error::system_error;
+        Error(const char* what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(const std::string& what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(int code, const char* what_arg) : std::system_error(code, std::system_category(), what_arg) {};
+        Error(int code, const std::string& what_arg) : std::system_error(code, std::system_category(), what_arg) {};
     };
 
-
-
-    class Error : public std::exception
-    {};
-
-    class NotImplemented : public Error
-        {public: virtual const char* what() {return "Socket method is not implemented";}};
-
-    class AlreadyCreatedError : public Error
-        {public: virtual const char* what() {return "Socket was already created";}};
-
-    class CreateError : public Error
-        {public: virtual const char* what() {return "Could not create socket";}};
-
-    class GetPortError : public Error
-        {public: virtual const char* what() {return "Could not find the socket's port";}};
-
-    class BindError : public Error
-        {public: virtual const char* what() {return "Could not bind socket";}};
-
-    class ListenError : public Error
-        {public: virtual const char* what() {return "Could not listen socket";}};
-
-    class AcceptError : public Error
-        {public: virtual const char* what() {return "Could not accept socket";}};
-
-    class ConnectError : public Error
-        {public: virtual const char* what() {return "Could not connect";}};
-
-    class SendError : public Error
-        {public: virtual const char* what() {return "Could not send data";}};
-
-    class ReceiveError : public Error
-        {public: virtual const char* what() {return "Could not receive data";}};
+    class CreateError  : public Error {public: using Error::Error;};
+    class GetPortError : public Error {public: using Error::Error;};
+    class BindError    : public Error {public: using Error::Error;};
+    class ListenError  : public Error {public: using Error::Error;};
+    class AcceptError  : public Error {public: using Error::Error;};
+    class ConnectError : public Error {public: using Error::Error;};
+    class SendError    : public Error {public: using Error::Error;};
+    class ReceiveError : public Error {public: using Error::Error;};
 
 
 
@@ -79,7 +60,6 @@ public:
     void close();
     bool isValid() const;
 
-    IpAddress getIP() const;
     uint16_t getPort() const;
 
     void bind(uint16_t port, IpAddress address = IpAddress::Any);
@@ -159,7 +139,7 @@ std::size_t Socket::recvUnprocessed(Container& container, int flags)
 {
     const std::size_t packet_size = this->recvSize(flags);
     container.resize(packet_size);
-    this->recvRaw((void*)(container.data()), packet_size, flags);
+    this->recvRaw(&container[0], packet_size, flags);
     return packet_size;
 }
 
@@ -170,7 +150,7 @@ std::size_t Socket::recv(Container& container, int flags)
     container.resize(content_size);
 
     this->recvUnprocessed(this->buffer, flags);
-    this->onReceive((uint8_t*)(container.data()), container.size());
+    this->onReceive((uint8_t*)(&container[0]), container.size());
     return content_size;
 }
 
@@ -178,7 +158,9 @@ std::size_t Socket::recv(Container& container, int flags)
 
 
 
-// Non-member
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup shared
+///@{
 inline uint8_t ntoh(uint8_t x)
 {
     return x;
@@ -212,5 +194,15 @@ inline uint64_t hton(uint64_t x)
 {
     return (static_cast<uint64_t>(hton(static_cast<uint32_t>(x))) << 32) | hton(static_cast<uint32_t>(x >> 32));
 }
+///@}
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class Socket
+/// \ingroup shared
+////////////////////////////////////////////////////////////////////////////////

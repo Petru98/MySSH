@@ -2,45 +2,25 @@
 #define INCLUDED_PIPE_HPP
 
 #include "FileDescriptor.hpp"
+#include <system_error>
 
 
 
 class Pipe
 {
 public:
-    class Error : std::exception
+    class Error : public std::system_error
     {
     public:
-        Error() : error(0) {}
-        Error(int error) : error(error) {}
-
-    protected:
-        int error;
+        using std::system_error::system_error;
+        Error(const char* what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(const std::string& what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(int code, const char* what_arg) : std::system_error(code, std::system_category(), what_arg) {};
+        Error(int code, const std::string& what_arg) : std::system_error(code, std::system_category(), what_arg) {};
     };
 
-    class CreateError : public Error
-    {
-    public:
-        CreateError() : Error(0), flags(0) {}
-        CreateError(int error, int flags) : Error(error), flags(flags) {}
-
-        const char* what() {return "could not create pipe";}
-
-    protected:
-        int flags;
-    };
-
-    class SetSizeError : public Error
-    {
-    public:
-        SetSizeError() : Error(0), size(0) {}
-        SetSizeError(int error, std::size_t size) : Error(error), size(size) {}
-
-        const char* what() {return "could not set pipe size";}
-
-    protected:
-        std::size_t size;
-    };
+    class CreateError  : public Error {public: using Error::Error;};
+    class SetSizeError : public Error {public: using Error::Error;};
 
 
 
@@ -62,3 +42,12 @@ protected:
 };
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class Pipe
+/// \ingroup shared
+////////////////////////////////////////////////////////////////////////////////

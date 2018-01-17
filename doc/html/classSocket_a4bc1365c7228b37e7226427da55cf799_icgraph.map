@@ -1,0 +1,6 @@
+<map id="Socket::recvString" name="Socket::recvString">
+<area shape="rect" id="node2" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="391,5,531,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="184,31,343,57"/>
+<area shape="rect" id="node3" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="579,5,743,32"/>
+<area shape="rect" id="node4" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="791,5,877,32"/>
+</map>

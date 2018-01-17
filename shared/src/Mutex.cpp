@@ -1,11 +1,13 @@
 #include <Mutex.hpp>
 
+
+
 // https://linux.die.net/man/3/pthread_mutex_init
 Mutex::Mutex()
 {
     const int error = pthread_mutex_init(&this->mutex, nullptr);
     if(error != 0)
-        throw CreateError("Could not create mutex", error);
+        throw CreateError(error, "could not create mutex");
 }
 
 Mutex::Mutex(const Mutex& that) : Mutex()
@@ -26,7 +28,7 @@ void Mutex::lock()
 {
     const int error = pthread_mutex_lock(&this->mutex);
     if(error != 0)
-        throw LockError("Could not lock mutex", error);
+        throw LockError(error, "could not lock mutex");
 }
 
 // https://linux.die.net/man/3/pthread_mutex_unlock
@@ -34,7 +36,7 @@ void Mutex::unlock()
 {
     const int error = pthread_mutex_unlock(&this->mutex);
     if(error != 0)
-        throw LockError("Could not unlock mutex", error);
+        throw LockError(error, "could not unlock mutex");
 }
 
 // https://linux.die.net/man/3/pthread_mutex_trylock
@@ -47,5 +49,5 @@ bool Mutex::trylock()
     if(error == EBUSY)
         return false;
 
-    throw LockError("Could not lock mutex", error);
+    throw LockError(error, "could not lock mutex");
 }

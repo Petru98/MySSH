@@ -1,0 +1,7 @@
+<map id="info" name="info">
+<area shape="rect" id="node2" href="$classServer.html#af447a87dcba3a5c41ee259d46a95b40a" title="Server::setClientCWD" alt="" coords="96,5,249,32"/>
+<area shape="rect" id="node3" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="297,5,505,32"/>
+<area shape="rect" id="node4" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="553,5,693,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="741,5,905,32"/>
+<area shape="rect" id="node6" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="953,5,1040,32"/>
+</map>

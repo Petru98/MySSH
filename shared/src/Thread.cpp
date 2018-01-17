@@ -1,6 +1,12 @@
 #include <Thread.hpp>
+#include <Mutex.hpp>
+#include <Lock.hpp>
 #include <csignal>
+#include <cstring>
 
+
+
+// Thread
 Thread::Thread() : thread(), joinable(false)
 {}
 
@@ -23,7 +29,7 @@ void Thread::detach()
     {
         const int error = pthread_detach(this->thread);
         if(error != 0)
-            throw DetachError("Could not detach thread", error);
+            throw DetachError(error, "could not detach thread");
 
         this->joinable = false;
     }
@@ -36,7 +42,7 @@ void Thread::join()
     {
         const int error = pthread_join(this->thread, nullptr);
         if(error != 0)
-            throw JoinError("Could not join thread", error);
+            throw JoinError(error, "could not join with thread");
 
         this->joinable = false;
     }
@@ -44,7 +50,7 @@ void Thread::join()
 
 
 
-// http://man7.org/linux/man-pages/man3/pthread_kill.3.html
+// https://linux.die.net/man/3/pthread_kill
 bool Thread::isAlive() const
 {
     if(this->isJoinable())
@@ -65,7 +71,7 @@ bool Thread::isJoinable() const
 pthread_t Thread::getId() const
 {
     if(this->isJoinable() == false)
-        throw InvalThreadError("No thread whose id to get");
+        throw NotLaunchedError("could not get the thread's id");
     return this->thread;
 }
 

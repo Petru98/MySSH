@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <limits>
+#include <cassert>
 #include <algorithm>
 
 
@@ -28,11 +29,11 @@ Socket::~Socket()
 void Socket::create(Protocols protocol, int family, int flags)
 {
     if(this->isValid())
-        throw AlreadyCreatedError();
+        throw CreateError("the socket object was already created");
 
     this->fd = socket(family, protocol | flags, 0);
     if(this->fd == -1)
-        throw CreateError();
+        throw CreateError(errno, "could not create socket");
 }
 void Socket::close()
 {
@@ -49,19 +50,13 @@ bool Socket::isValid() const
 
 
 
-IpAddress Socket::getIP() const
-{
-    throw NotImplemented();
-
-    return IpAddress();
-}
 uint16_t Socket::getPort() const
 {
     sockaddr_in sin;
     socklen_t len = sizeof(sin);
 
     if(getsockname(this->fd, reinterpret_cast<sockaddr*>(&sin), &len) == -1)
-        throw GetPortError();
+        throw GetPortError(errno, "could not get the socket's port");
     return ntohs(sin.sin_port);
 }
 
@@ -75,12 +70,12 @@ void Socket::bind(uint16_t port, IpAddress address)
     addr.sin_port = htons(port);
 
     if(::bind(this->fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1)
-        throw BindError();
+        throw BindError(errno, "could not bind the socket");
 }
 void Socket::listen(int max_pending_connections)
 {
     if(::listen(this->fd, max_pending_connections) == -1)
-        throw ListenError();
+        throw ListenError(errno, "could not listen to port with socket");
 }
 bool Socket::accept(IpAddress& address, uint16_t& port, Socket& sock)
 {
@@ -92,7 +87,7 @@ bool Socket::accept(IpAddress& address, uint16_t& port, Socket& sock)
     {
         if(errno == EWOULDBLOCK || errno == EAGAIN)
             return false;
-        throw AcceptError();
+        throw AcceptError(errno, "could not accept a connection with socket");
     }
 
     address = ntohl(addr.sin_addr.s_addr);
@@ -113,7 +108,7 @@ bool Socket::connect(IpAddress address, uint16_t port)
     {
         if(errno == EINPROGRESS)
             return false;
-        throw ConnectError();
+        throw ConnectError(errno, "could not connect with socket");
     }
 
     return true;
@@ -123,13 +118,15 @@ bool Socket::connect(IpAddress address, uint16_t port)
 
 void Socket::sendRaw(const void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
+
     while(size > 0)
     {
         ssize_t sent = ::send(this->fd, data, size, flags);
         if(sent == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
-                throw SendError();
+                throw SendError(errno, "could not send data with socket");
         }
         else
         {
@@ -140,13 +137,15 @@ void Socket::sendRaw(const void* data, std::size_t size, int flags)
 }
 void Socket::recvRaw(void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
+
     while(size > 0)
     {
         ssize_t received = ::recv(this->fd, data, size, flags);
         if(received == -1)
         {
             if(errno != EWOULDBLOCK && errno != EAGAIN)
-                throw ReceiveError();
+                throw ReceiveError(errno, "could not receive data with socket");
         }
         else
         {
@@ -160,16 +159,21 @@ void Socket::recvRaw(void* data, std::size_t size, int flags)
 
 void Socket::sendSize(std::size_t data, int flags)
 {
-    if(data > std::numeric_limits<uint32_t>::max())
-        throw std::runtime_error("could not send size because it is too big");
+    typedef uint32_t fixed_size_t;
+    if(sizeof(std::size_t) > sizeof(fixed_size_t) && data > std::numeric_limits<fixed_size_t>::max())
+        throw SendError("could not send size because its value is too big");
 
-    const uint32_t size = hton(static_cast<uint32_t>(data));
+    const fixed_size_t size = hton(static_cast<fixed_size_t>(data));
     return this->sendRaw(&size, sizeof(size), flags);
 }
 std::size_t Socket::recvSize(int flags)
 {
-    uint32_t size;
+    typedef uint32_t fixed_size_t;
+    fixed_size_t size;
     this->recvRaw(&size, sizeof(size), flags);
+
+    if(sizeof(std::size_t) < sizeof(fixed_size_t) && std::numeric_limits<std::size_t>::max() < size)
+        throw ReceiveError("could not receive size because its value is too big");
     return static_cast<std::size_t>(ntoh(size));
 }
 
@@ -177,6 +181,7 @@ std::size_t Socket::recvSize(int flags)
 
 void Socket::sendUnprocessed(const void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
     if(size == 0)
         return;
 
@@ -185,12 +190,13 @@ void Socket::sendUnprocessed(const void* data, std::size_t size, int flags)
 }
 std::size_t Socket::recvUnprocessed(void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
     if(size == 0)
         return 0;
 
     const std::size_t packet_size = this->recvSize(flags);
     if(packet_size > size)
-        throw ReceiveError();
+        throw ReceiveError("packet size is bigger than the buffer size");
 
     this->recvRaw(data, packet_size, flags);
     return packet_size;
@@ -200,6 +206,7 @@ std::size_t Socket::recvUnprocessed(void* data, std::size_t size, int flags)
 
 void Socket::send(const void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
     if(size == 0)
         return;
 
@@ -209,12 +216,13 @@ void Socket::send(const void* data, std::size_t size, int flags)
 }
 std::size_t Socket::recv(void* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
     if(size == 0)
         return 0;
 
     const std::size_t content_size = this->recvSize(flags);
     if(content_size > size)
-        throw ReceiveError();
+        throw ReceiveError("packet content size is bigger than the buffer size");
 
     this->recvUnprocessed(this->buffer, flags);
     this->onReceive(reinterpret_cast<uint8_t*>(data), this->buffer.size());
@@ -240,8 +248,7 @@ void Socket::send32(uint32_t data, int flags)
 }
 void Socket::sendString(const char* data, std::size_t length, int flags)
 {
-    if(data == nullptr)
-        throw std::logic_error("cannot send nullptr string");
+    assert(data != nullptr);
     if(length == 0)
         length = strlen(data);
 
@@ -272,6 +279,10 @@ uint32_t Socket::recv32(int flags)
 }
 std::size_t Socket::recvString(char* data, std::size_t size, int flags)
 {
+    assert(data != nullptr || size == 0);
+    if(size == 0)
+        return 0;
+
     this->recv(data, size - 1, flags);
     data[size] = '\0';
     return size;

@@ -1,0 +1,9 @@
+<map id="Server::loopInterface" name="Server::loopInterface">
+<area shape="rect" id="node2" href="$group__shared.html#ga42e65774c872bb2ffd35e7827f481776" title="print" alt="" coords="253,5,299,32"/>
+<area shape="rect" id="node3" href="$classServer.html#a3aa79a4c51bbd44fadafe7277f1e535e" title="Server::parseCommand" alt="" coords="196,56,356,83"/>
+<area shape="rect" id="node4" href="$group__shared.html#gac33c8a42a58a6379397850b60be22028" title="error" alt="" coords="252,107,300,133"/>
+<area shape="rect" id="node5" href="$classServer.html#aeb1df0c4c94293f7a737aae4726ae667" title="Server::addUser" alt="" coords="217,157,335,184"/>
+<area shape="rect" id="node7" href="$classServer.html#a738ea76b6e744049a4c0ec121166fd39" title="Server::removeUser" alt="" coords="207,208,345,235"/>
+<area shape="rect" id="node8" href="$classSocket.html#affd657b790038c387619c0350a5f8988" title="Socket::getPort" alt="" coords="219,259,333,285"/>
+<area shape="rect" id="node6" href="$classServer.html#aebb3c53a641d61b169a7dcf890ae86aa" title="Server::findUser" alt="" coords="404,183,521,209"/>
+</map>

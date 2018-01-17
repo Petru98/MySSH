@@ -1,0 +1,10 @@
+<map id="shared/include/Pipe.hpp" name="shared/include/Pipe.hpp">
+<area shape="rect" id="node2" href="$ClientInfo_8hpp.html" title="server/include/ClientInfo.hpp" alt="" coords="134,80,322,107"/>
+<area shape="rect" id="node7" href="$CommandTree_8hpp.html" title="server/include/CommandTree.hpp" alt="" coords="347,80,565,107"/>
+<area shape="rect" id="node9" href="$Pipe_8cpp.html" title="shared/src/Pipe.cpp" alt="" coords="589,80,728,107"/>
+<area shape="rect" id="node3" href="$Server_8hpp.html" title="server/include/Server.hpp" alt="" coords="5,155,176,181"/>
+<area shape="rect" id="node6" href="$ClientInfo_8cpp.html" title="server/src/ClientInfo.cpp" alt="" coords="200,155,365,181"/>
+<area shape="rect" id="node4" href="$server_2src_2main_8cpp.html" title="server/src/main.cpp" alt="" coords="22,229,159,256"/>
+<area shape="rect" id="node5" href="$Server_8cpp.html" title="server/src/Server.cpp" alt="" coords="256,229,403,256"/>
+<area shape="rect" id="node8" href="$CommandTree_8cpp.html" title="server/src/CommandTree.cpp" alt="" coords="440,155,635,181"/>
+</map>

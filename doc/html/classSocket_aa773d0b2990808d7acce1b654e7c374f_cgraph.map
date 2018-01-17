@@ -1,0 +1,9 @@
+<map id="Socket::sendString" name="Socket::sendString">
+<area shape="rect" id="node2" href="$classSocket.html#a47a942f6eee040f2d610f9b9aacf6afc" title="Socket::sendString" alt="" coords="187,81,320,108"/>
+<area shape="rect" id="node3" href="$classSocket.html#a508f5074185bbe1041bb9e009682f42e" title="Socket::send" alt="" coords="368,81,467,108"/>
+<area shape="rect" id="node4" href="$classSocket.html#a61624be4ff53b1cca76b366d3184109c" title="Socket::onSend" alt="" coords="545,5,660,32"/>
+<area shape="rect" id="node5" href="$classSocket.html#a092f2104d235dbe454a4c9ac862046ce" title="Socket::sendSize" alt="" coords="739,56,864,83"/>
+<area shape="rect" id="node8" href="$classSocket.html#ad1f4905f57f4f870f2ead63c30f35626" title="Socket::sendUnprocessed" alt="" coords="515,107,691,133"/>
+<area shape="rect" id="node6" href="$group__shared.html#gacf439177de6e6a4b67d2b15bb32fca3e" title="hton" alt="" coords="952,56,999,83"/>
+<area shape="rect" id="node7" href="$classSocket.html#a9546973e652fe1904ff8a196924dad61" title="Socket::sendRaw" alt="" coords="912,107,1039,133"/>
+</map>

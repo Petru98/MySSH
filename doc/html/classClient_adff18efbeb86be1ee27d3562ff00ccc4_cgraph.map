@@ -1,0 +1,15 @@
+<map id="Client::loop" name="Client::loop">
+<area shape="rect" id="node2" href="$classSocket.html#af6691954be5b07b31eedf6ccb0470c64" title="Socket::recv" alt="" coords="332,117,428,143"/>
+<area shape="rect" id="node8" href="$classSocket.html#a508f5074185bbe1041bb9e009682f42e" title="Socket::send" alt="" coords="143,294,242,321"/>
+<area shape="rect" id="node14" href="$classSocket.html#a8a304732c2f7424a68816e23e0e98b1f" title="Socket::recv8" alt="" coords="141,186,244,213"/>
+<area shape="rect" id="node3" href="$classSocket.html#ac31e20c2da76a84189bd9b22531d7d23" title="Socket::recvSize" alt="" coords="739,117,862,143"/>
+<area shape="rect" id="node6" href="$classSocket.html#a32fefaebf081a8d2328ee699fcae3cd3" title="Socket::recvUnprocessed" alt="" coords="516,41,689,67"/>
+<area shape="rect" id="node7" href="$classSocket.html#a85891828304dd63c7003cc6bae346dd3" title="Socket::onReceive" alt="" coords="536,91,669,118"/>
+<area shape="rect" id="node4" href="$classSocket.html#abc462735f57e2675b03b8b439b6c37ed" title="Socket::recvRaw" alt="" coords="912,41,1035,67"/>
+<area shape="rect" id="node5" href="$group__shared.html#ga19a2e93d6405cd94a9178a57c37ada8e" title="ntoh" alt="" coords="950,155,997,182"/>
+<area shape="rect" id="node9" href="$classSocket.html#a61624be4ff53b1cca76b366d3184109c" title="Socket::onSend" alt="" coords="323,294,437,321"/>
+<area shape="rect" id="node10" href="$classSocket.html#a092f2104d235dbe454a4c9ac862046ce" title="Socket::sendSize" alt="" coords="540,294,665,321"/>
+<area shape="rect" id="node13" href="$classSocket.html#ad1f4905f57f4f870f2ead63c30f35626" title="Socket::sendUnprocessed" alt="" coords="292,345,468,371"/>
+<area shape="rect" id="node11" href="$group__shared.html#gacf439177de6e6a4b67d2b15bb32fca3e" title="hton" alt="" coords="777,294,824,321"/>
+<area shape="rect" id="node12" href="$classSocket.html#a9546973e652fe1904ff8a196924dad61" title="Socket::sendRaw" alt="" coords="737,345,864,371"/>
+</map>

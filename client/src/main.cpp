@@ -1,4 +1,6 @@
 #include <Client.hpp>
+#include <Logging.hpp>
+#include <memory>
 #include <iostream>
 
 
@@ -9,16 +11,16 @@ int main(int argc, char** argv)
 
     try
     {
-        Client* client = new Client();
+        std::unique_ptr<Client> client(new Client());
         client->run(argc, argv);
     }
     catch(std::exception& e)
     {
-        std::cout << "error: " << e.what() << '\n';
+        error(e.what());
     }
     catch(...)
     {
-        std::cout << "error: unknown error caught in 'main'\n";
+        error("unknown exception caught in 'main'");
     }
 
     return 0;

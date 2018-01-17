@@ -1,0 +1,9 @@
+<map id="ClientInfo::DisconnectedError::what" name="ClientInfo::DisconnectedError::what">
+<area shape="rect" id="node2" href="$classClientInfo.html#ad71d8cae5333d6e0dd9807311c52946d" title="ClientInfo::ClientInfo" alt="" coords="224,5,367,32"/>
+<area shape="rect" id="node3" href="$classClientInfo.html#ae3804e108c0bdf634a796b66b26bcaba" title="ClientInfo::~ClientInfo" alt="" coords="220,56,371,83"/>
+<area shape="rect" id="node4" href="$classClientInfo.html#aff385d2fc191d8fcb6e6e1704426a67b" title="ClientInfo::disconnect" alt="" coords="423,107,573,133"/>
+<area shape="rect" id="node8" href="$classClientInfo.html#a1c68145c149ff81354e1b9903e7160c7" title="ClientInfo::isConnected" alt="" coords="419,157,577,184"/>
+<area shape="rect" id="node5" href="$classSocket.html#af9d9af6ef1d233ca1624b41c905346d2" title="Socket::isValid" alt="" coords="625,157,736,184"/>
+<area shape="rect" id="node6" href="$classPipe.html#a748080f6a234d91f0329ce8479bb38b2" title="Pipe::write" alt="" coords="639,107,723,133"/>
+<area shape="rect" id="node7" href="$classFileDescriptor.html#afe2ccaa68f9da93722dff456a6eef16c" title="FileDescriptor::write" alt="" coords="784,107,923,133"/>
+</map>

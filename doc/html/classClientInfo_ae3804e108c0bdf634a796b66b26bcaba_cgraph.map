@@ -1,0 +1,6 @@
+<map id="ClientInfo::~ClientInfo" name="ClientInfo::~ClientInfo">
+<area shape="rect" id="node2" href="$classClientInfo.html#aff385d2fc191d8fcb6e6e1704426a67b" title="ClientInfo::disconnect" alt="" coords="204,31,353,57"/>
+<area shape="rect" id="node3" href="$classSocket.html#af9d9af6ef1d233ca1624b41c905346d2" title="Socket::isValid" alt="" coords="401,5,512,32"/>
+<area shape="rect" id="node4" href="$classPipe.html#a748080f6a234d91f0329ce8479bb38b2" title="Pipe::write" alt="" coords="415,56,499,83"/>
+<area shape="rect" id="node5" href="$classFileDescriptor.html#afe2ccaa68f9da93722dff456a6eef16c" title="FileDescriptor::write" alt="" coords="560,56,699,83"/>
+</map>

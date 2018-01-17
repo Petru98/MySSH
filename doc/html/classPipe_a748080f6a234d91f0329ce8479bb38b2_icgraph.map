@@ -1,0 +1,9 @@
+<map id="Pipe::write" name="Pipe::write">
+<area shape="rect" id="node2" href="$classClientInfo.html#aff385d2fc191d8fcb6e6e1704426a67b" title="ClientInfo::disconnect" alt="" coords="167,66,316,93"/>
+<area shape="rect" id="node5" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="137,117,345,143"/>
+<area shape="rect" id="node3" href="$classClientInfo_1_1DisconnectedError.html#ae410bc9ccd99958a91cf9efe0c5ba209" title="ClientInfo::Disconnected\lError::what" alt="" coords="592,29,759,71"/>
+<area shape="rect" id="node4" href="$classClientInfo.html#ae3804e108c0bdf634a796b66b26bcaba" title="ClientInfo::~ClientInfo" alt="" coords="393,66,544,93"/>
+<area shape="rect" id="node6" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="399,117,539,143"/>
+<area shape="rect" id="node7" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="593,117,757,143"/>
+<area shape="rect" id="node8" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="807,117,893,143"/>
+</map>

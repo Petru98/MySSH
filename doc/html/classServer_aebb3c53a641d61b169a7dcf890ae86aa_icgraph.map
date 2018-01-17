@@ -1,0 +1,10 @@
+<map id="Server::findUser" name="Server::findUser">
+<area shape="rect" id="node2" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="171,5,329,32"/>
+<area shape="rect" id="node6" href="$classServer.html#afe0dcc2cb7661be2655f3d1f77960c0a" title="Server::findUser" alt="" coords="191,56,309,83"/>
+<area shape="rect" id="node7" href="$classServer.html#aeb1df0c4c94293f7a737aae4726ae667" title="Server::addUser" alt="" coords="191,107,309,133"/>
+<area shape="rect" id="node9" href="$classServer.html#a738ea76b6e744049a4c0ec121166fd39" title="Server::removeUser" alt="" coords="181,157,319,184"/>
+<area shape="rect" id="node3" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="379,12,519,39"/>
+<area shape="rect" id="node4" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="568,37,732,64"/>
+<area shape="rect" id="node5" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="780,69,867,96"/>
+<area shape="rect" id="node8" href="$classServer.html#a78c1590a7e37c2787c5ba8a1ea6c3d7a" title="Server::loopInterface" alt="" coords="377,107,520,133"/>
+</map>

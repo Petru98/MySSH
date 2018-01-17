@@ -1,0 +1,21 @@
+<map id="shared/include/FileDescriptor.hpp" name="shared/include/FileDescriptor.hpp">
+<area shape="rect" id="node2" href="$Socket_8hpp.html" title="shared/include/Socket.hpp" alt="" coords="335,80,511,107"/>
+<area shape="rect" id="node16" href="$Pipe_8hpp.html" title="shared/include/Pipe.hpp" alt="" coords="598,155,759,181"/>
+<area shape="rect" id="node20" href="$FileDescriptor_8cpp.html" title="shared/src/FileDescriptor.cpp" alt="" coords="673,80,866,107"/>
+<area shape="rect" id="node3" href="$PgpSocket_8hpp.html" title="shared/include/PgpSocket.hpp" alt="" coords="323,155,522,181"/>
+<area shape="rect" id="node15" href="$Socket_8cpp.html" title="shared/src/Socket.cpp" alt="" coords="146,155,299,181"/>
+<area shape="rect" id="node4" href="$ClientInfo_8hpp.html" title="server/include/ClientInfo.hpp" alt="" coords="491,229,679,256"/>
+<area shape="rect" id="node9" href="$ServerInfo_8hpp.html" title="client/include/ServerInfo.hpp" alt="" coords="80,229,267,256"/>
+<area shape="rect" id="node14" href="$PgpSocket_8cpp.html" title="shared/src/PgpSocket.cpp" alt="" coords="291,229,467,256"/>
+<area shape="rect" id="node5" href="$Server_8hpp.html" title="server/include/Server.hpp" alt="" coords="464,304,635,331"/>
+<area shape="rect" id="node8" href="$ClientInfo_8cpp.html" title="server/src/ClientInfo.cpp" alt="" coords="659,304,824,331"/>
+<area shape="rect" id="node6" href="$server_2src_2main_8cpp.html" title="server/src/main.cpp" alt="" coords="481,379,618,405"/>
+<area shape="rect" id="node7" href="$Server_8cpp.html" title="server/src/Server.cpp" alt="" coords="715,379,861,405"/>
+<area shape="rect" id="node10" href="$Client_8hpp.html" title="client/include/Client.hpp" alt="" coords="74,304,235,331"/>
+<area shape="rect" id="node13" href="$ServerInfo_8cpp.html" title="client/src/ServerInfo.cpp" alt="" coords="259,304,423,331"/>
+<area shape="rect" id="node11" href="$Client_8cpp.html" title="client/src/Client.cpp" alt="" coords="5,379,144,405"/>
+<area shape="rect" id="node12" href="$client_2src_2main_8cpp.html" title="client/src/main.cpp" alt="" coords="169,379,301,405"/>
+<area shape="rect" id="node17" href="$CommandTree_8hpp.html" title="server/include/CommandTree.hpp" alt="" coords="867,229,1085,256"/>
+<area shape="rect" id="node19" href="$Pipe_8cpp.html" title="shared/src/Pipe.cpp" alt="" coords="704,229,843,256"/>
+<area shape="rect" id="node18" href="$CommandTree_8cpp.html" title="server/src/CommandTree.cpp" alt="" coords="899,304,1093,331"/>
+</map>

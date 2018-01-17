@@ -1,0 +1,8 @@
+<map id="ClientInfo" name="ClientInfo">
+<area shape="rect" id="node2" href="$classMutex.html" title="Mutex" alt="" coords="5,196,64,223"/>
+<area shape="rect" id="node3" href="$classIpAddress.html" title="IpAddress" alt="" coords="89,196,170,223"/>
+<area shape="rect" id="node4" href="$classPgpSocket.html" title="PgpSocket" alt="" coords="246,196,333,223"/>
+<area shape="rect" id="node5" href="$classSocket.html" title="Socket" alt="" coords="271,95,334,121"/>
+<area shape="rect" id="node6" href="$classFileDescriptor.html" title="FileDescriptor" alt="" coords="293,5,395,32"/>
+<area shape="rect" id="node7" href="$classPipe.html" title="Pipe" alt="" coords="355,145,403,172"/>
+</map>

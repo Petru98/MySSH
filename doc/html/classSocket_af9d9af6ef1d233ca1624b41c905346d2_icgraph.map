@@ -1,0 +1,18 @@
+<map id="Socket::isValid" name="Socket::isValid">
+<area shape="rect" id="node2" href="$classClientInfo.html#aff385d2fc191d8fcb6e6e1704426a67b" title="ClientInfo::disconnect" alt="" coords="169,37,318,63"/>
+<area shape="rect" id="node5" href="$classClientInfo.html#a1c68145c149ff81354e1b9903e7160c7" title="ClientInfo::isConnected" alt="" coords="164,87,323,114"/>
+<area shape="rect" id="node6" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="571,239,735,266"/>
+<area shape="rect" id="node8" href="$classSocket.html#a79d2e7d928415e5822dbb956b2144a62" title="Socket::create" alt="" coords="190,493,297,519"/>
+<area shape="rect" id="node11" href="$classSocket.html#a75ee749264ccbcfc4dfbf5442e55dcb8" title="Socket::close" alt="" coords="192,290,295,317"/>
+<area shape="rect" id="node3" href="$classClientInfo_1_1DisconnectedError.html#ae410bc9ccd99958a91cf9efe0c5ba209" title="ClientInfo::Disconnected\lError::what" alt="" coords="569,29,736,71"/>
+<area shape="rect" id="node4" href="$classClientInfo.html#ae3804e108c0bdf634a796b66b26bcaba" title="ClientInfo::~ClientInfo" alt="" coords="371,37,521,63"/>
+<area shape="rect" id="node7" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="784,341,871,367"/>
+<area shape="rect" id="node9" href="$classServer.html#a005553503cd2550703a68e1284a30d4c" title="Server::init" alt="" coords="610,493,695,519"/>
+<area shape="rect" id="node10" href="$classSocket.html#aa34543d180dffc6271783170314316b1" title="Socket::Socket" alt="" coords="390,493,502,519"/>
+<area shape="rect" id="node12" href="$classClient.html#ac281d70a5e40f98bb16a0760d0975cc0" title="Client::free" alt="" coords="403,391,489,418"/>
+<area shape="rect" id="node14" href="$classServer.html#ae593fb8fdc15760fc1feb3511af970d2" title="Server::free" alt="" coords="607,341,698,367"/>
+<area shape="rect" id="node15" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="376,239,516,266"/>
+<area shape="rect" id="node16" href="$classSocket.html#aeac4eb6379a543d38ed88977d3b6630a" title="Socket::~Socket" alt="" coords="386,442,506,469"/>
+<area shape="rect" id="node17" href="$classSocket.html#a179c1d8c3f24a4be8ea6b6a74b2b1d48" title="Socket::accept" alt="" coords="391,290,501,317"/>
+<area shape="rect" id="node13" href="$classClient.html#a4b58c2aaefda7db6e866074762d4ff8e" title="Client::run" alt="" coords="611,391,694,418"/>
+</map>

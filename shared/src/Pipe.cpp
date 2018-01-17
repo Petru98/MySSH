@@ -1,4 +1,5 @@
 #include <Pipe.hpp>
+#include <cerrno>
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -8,9 +9,9 @@ Pipe::Pipe(int flags)
 {
     int pipefd[2];
 
-    int error = pipe2(pipefd, flags);
+    const int error = pipe2(pipefd, flags);
     if(error == -1)
-        throw CreateError(error, flags);
+        throw CreateError(errno, "could not create pipe");
 
     this->fd[0].setFD(pipefd[0]);
     this->fd[1].setFD(pipefd[1]);
@@ -47,9 +48,9 @@ void Pipe::setSize(std::size_t size)
 {
     int error = fcntl(this->fd[0].getFD(), F_SETPIPE_SZ, static_cast<int>(size));
     if(error == -1)
-        throw SetSizeError(errno, size);
+        throw SetSizeError(errno, "could not set pipe size for read side");
 
     error = fcntl(this->fd[1].getFD(), F_SETPIPE_SZ, static_cast<int>(size));
     if(error == -1)
-        throw SetSizeError(errno, size);
+        throw SetSizeError(errno, "could not set pipe size for write side");
 }

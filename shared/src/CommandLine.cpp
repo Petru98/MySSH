@@ -1,6 +1,5 @@
 #include "CommandLine.hpp"
 
-#include <stdexcept>
 #include <utility>
 #include <cassert>
 
@@ -13,28 +12,28 @@ CommandLine::~CommandLine()
 
 void CommandLine::addFlag(char short_key, std::string&& long_key, bool default_value)
 {
-    assert(this->long_names[short_key].empty() == true);
+    assert(this->long_names[short_key].empty() == true && long_key.find_first_of(" \t\n") == std::string::npos);
     if(short_key != '\0')
         this->long_names[short_key] = long_key;
     this->flags.insert(std::make_pair(std::move(long_key), default_value));
 }
 void CommandLine::addFlag(char short_key, const std::string& long_key, bool default_value)
 {
-    assert(this->long_names[short_key].empty() == true);
+    assert(this->long_names[short_key].empty() == true && long_key.find_first_of(" \t\n") == std::string::npos);
     if(short_key != '\0')
         this->long_names[short_key] = long_key;
     this->flags.insert(std::make_pair(long_key, default_value));
 }
 void CommandLine::addOption(char short_key, std::string&& long_key, std::string&& default_value)
 {
-    assert(this->long_names[short_key].empty() == true);
+    assert(this->long_names[short_key].empty() == true && long_key.find_first_of(" \t\n") == std::string::npos);
     if(short_key != '\0')
         this->long_names[short_key] = long_key;
     this->options.insert(std::make_pair(std::move(long_key), std::move(default_value)));
 }
 void CommandLine::addOption(char short_key, const std::string& long_key, std::string&& default_value)
 {
-    assert(this->long_names[short_key].empty() == true);
+    assert(this->long_names[short_key].empty() == true && long_key.find_first_of(" \t\n") == std::string::npos);
     if(short_key != '\0')
         this->long_names[short_key] = long_key;
     this->options.insert(std::make_pair(long_key, std::move(default_value)));
@@ -112,7 +111,7 @@ void CommandLine::parse(int argc, char** argv)
             if(this->flags.find(key) != this->flags.end())
             {
                 if((*it) != '\0')
-                    throw std::runtime_error(std::string("flags can't have values ") + argv[i]);
+                    throw ParseError(argv[i] + std::string(" can't have a value because it is a flag"));
                 this->flags[key] = true;
             }
             else if(this->options.find(key) != this->options.end())
@@ -123,14 +122,14 @@ void CommandLine::parse(int argc, char** argv)
                 {
                     ++i;
                     if(i == argc)
-                        throw std::runtime_error(std::string("expected option value ") + argv[i - 1]);
+                        throw ParseError(std::string("expected value for option ") + argv[i - 1]);
                     it = argv[i];
                 }
 
                 this->options[key] = it;
             }
             else
-                throw std::runtime_error(std::string("unknown argument ") + argv[i]);
+                throw ParseError(std::string("unknown argument ") + argv[i]);
         }
     }
 }

@@ -1,0 +1,7 @@
+<map id="Pipe::read" name="Pipe::read">
+<area shape="rect" id="node2" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="137,5,345,32"/>
+<area shape="rect" id="node6" href="$classServer.html#aea5884a81009bb3f41e6b7a9f15afa6a" title="Server::executeServerCommand" alt="" coords="135,56,347,83"/>
+<area shape="rect" id="node3" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="395,31,535,57"/>
+<area shape="rect" id="node4" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="583,31,747,57"/>
+<area shape="rect" id="node5" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="795,31,881,57"/>
+</map>

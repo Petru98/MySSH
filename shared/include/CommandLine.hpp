@@ -5,10 +5,18 @@
 #include <unordered_set>
 #include <string>
 #include <vector>
+#include <stdexcept>
+
+
 
 class CommandLine
 {
 public:
+    class Error      : public std::runtime_error {public: using std::runtime_error::runtime_error;};
+    class ParseError : public Error              {public: using Error::Error;};
+
+
+
     CommandLine();
     ~CommandLine();
 
@@ -36,3 +44,12 @@ private:
 };
 
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class CommandLine
+/// \ingroup shared
+////////////////////////////////////////////////////////////////////////////////

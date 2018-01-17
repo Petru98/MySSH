@@ -1,0 +1,8 @@
+<map id="Socket::send8" name="Socket::send8">
+<area shape="rect" id="node2" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="420,58,560,85"/>
+<area shape="rect" id="node5" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="187,33,345,60"/>
+<area shape="rect" id="node6" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="162,84,370,110"/>
+<area shape="rect" id="node7" href="$classServer.html#aea5884a81009bb3f41e6b7a9f15afa6a" title="Server::executeServerCommand" alt="" coords="160,134,372,161"/>
+<area shape="rect" id="node3" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="608,58,772,85"/>
+<area shape="rect" id="node4" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="820,58,907,85"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Socket::sendString" name="Socket::sendString">
+<area shape="rect" id="node2" href="$classServer.html#a5a6b1dac89d67c3d6387b0537de8b5ad" title="Server::executeClientCommand" alt="" coords="187,5,395,32"/>
+<area shape="rect" id="node6" href="$classSocket.html#aa773d0b2990808d7acce1b654e7c374f" title="Socket::sendString" alt="" coords="224,56,357,83"/>
+<area shape="rect" id="node3" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="443,5,583,32"/>
+<area shape="rect" id="node4" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="631,5,795,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="843,5,929,32"/>
+</map>

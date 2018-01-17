@@ -1,0 +1,11 @@
+<map id="server/include/Server.hpp" name="server/include/Server.hpp">
+<area shape="rect" id="node2" href="$ClientInfo_8hpp.html" title="ClientInfo.hpp" alt="" coords="470,80,573,107"/>
+<area shape="rect" id="node20" href="$CommandLine_8hpp.html" title="CommandLine.hpp" alt="" coords="967,229,1097,256"/>
+<area shape="rect" id="node24" href="$Thread_8hpp.html" title="Thread.hpp" alt="" coords="863,155,950,181"/>
+<area shape="rect" id="node3" href="$PgpSocket_8hpp.html" title="PgpSocket.hpp" alt="" coords="373,155,483,181"/>
+<area shape="rect" id="node16" href="$Mutex_8hpp.html" title="Mutex.hpp" alt="" coords="599,155,681,181"/>
+<area shape="rect" id="node19" href="$Pipe_8hpp.html" title="Pipe.hpp" alt="" coords="479,229,553,256"/>
+<area shape="rect" id="node4" href="$Socket_8hpp.html" title="Socket.hpp" alt="" coords="367,229,455,256"/>
+<area shape="rect" id="node10" href="$IpAddress_8hpp.html" title="IpAddress.hpp" alt="" coords="103,304,209,331"/>
+<area shape="rect" id="node14" href="$FileDescriptor_8hpp.html" title="FileDescriptor.hpp" alt="" coords="457,304,585,331"/>
+</map>

@@ -1,4 +1,6 @@
 #include <IpAddress.hpp>
+#include <error.hpp>
+#include <cerrno>
 
 
 
@@ -34,17 +36,23 @@ IpAddress& IpAddress::operator= (const std::string& address)
 {
     // https://github.com/SFML/SFML/blob/247b03172c34f25a808bcfdc49f390d619e7d5e0/src/SFML/Network/IpAddress.cpp#L164
 
-    if(inet_aton(address.c_str(), &this->address) == 0) // Try converting it and if it is not an IP address (zero returned) then interpret it as a host name
+    if(inet_aton(address.c_str(), &this->address) == 0) // Try converting it and if it's not a valid IP address then interpret it as a host name
     {
         addrinfo hints = {};
         hints.ai_family = AF_INET;
         addrinfo* result = nullptr;
 
-        if(getaddrinfo(address.c_str(), nullptr, &hints, &result) != 0)
-            throw GetHostAddressError();
+        const int error = getaddrinfo(address.c_str(), nullptr, &hints, &result);
+        if(error != 0)
+        {
+            if(error != EAI_SYSTEM)
+                throw GetHostAddressError(error, gai_strerr(error));
+            else
+                throw GetHostAddressError(errno, "could not get host's IP address");
+        }
 
         if(result == nullptr)
-            throw InvalidAddressError();
+            throw InvalidAddressError("invalid IP address and host name");
 
         this->address = reinterpret_cast<sockaddr_in*>(result->ai_addr)->sin_addr;
         freeaddrinfo(result);

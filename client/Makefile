@@ -57,7 +57,7 @@ ifneq (clean,$(TARGET))
 
     SHAREDINCDIR := $(SHAREDDIR)/include
     SHAREDOBJDIR := $(SHAREDDIR)/.obj
-    SHAREDOBJS   := tinyxml2 PgpSocket Socket IpAddress CommandLine FileDescriptor
+    SHAREDOBJS   := PgpSocket Socket IpAddress CommandLine FileDescriptor Logging error Lock Mutex tinyxml2
     SHAREDOBJS   := $(shell find $(SHAREDOBJDIR) -type f -name "*.o" | grep $(addprefix -e ,$(SHAREDOBJS)))
 
 
@@ -79,7 +79,7 @@ ifneq (clean,$(TARGET))
     SRCS := $(shell find $(SRCDIR) -type f -name "*.cpp") \
             $(shell find $(SRCDIR) -type f -name "*.c")
 
-    LIBS := crypto++
+    LIBS := crypto++ pthread
 
     # Full paths to object/dependency files
     OBJS := $(patsubst $(SRCDIR)/%.cpp,$(OBJDIR)/%.cpp.o,$(filter %.cpp,$(SRCS))) \

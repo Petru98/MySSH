@@ -1,0 +1,11 @@
+<map id="Thread::selfId" name="Thread::selfId">
+<area shape="rect" id="node2" href="$classThread.html#a3cc2e0f6c5a310cdd8e6455b6fb5330d" title="Thread::isJoinable" alt="" coords="156,107,284,133"/>
+<area shape="rect" id="node3" href="$classThread.html#af266fc038baa99bc6e95e3a8aca8490e" title="Thread::launch" alt="" coords="333,5,441,32"/>
+<area shape="rect" id="node5" href="$classThread.html#a94278838e3bdd68971be803924e63bca" title="Thread::detach" alt="" coords="332,56,441,83"/>
+<area shape="rect" id="node7" href="$classThread.html#a4d9d788e98388a3217831a9046709deb" title="Thread::join" alt="" coords="341,107,432,133"/>
+<area shape="rect" id="node9" href="$classThread.html#af1b9da363e1292265f81797b01621ae2" title="Thread::isAlive" alt="" coords="332,157,441,184"/>
+<area shape="rect" id="node10" href="$classThread.html#a1e0a70f4c035ae3e24292ef713a29b51" title="Thread::getId" alt="" coords="337,208,436,235"/>
+<area shape="rect" id="node4" href="$classThread.html#ad3a340b020f667af1cf35a6e02670a48" title="Thread::Thread" alt="" coords="493,5,604,32"/>
+<area shape="rect" id="node6" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="505,56,592,83"/>
+<area shape="rect" id="node8" href="$classThread.html#a37d9edd3a1a776cbc27dedff949c9726" title="Thread::~Thread" alt="" coords="489,107,608,133"/>
+</map>

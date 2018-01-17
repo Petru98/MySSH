@@ -30,7 +30,7 @@ Server::~Server()
 
 void Server::setClientCWD(std::size_t index, const std::string& dir)
 {
-    Client& client = (*this->clients[index]);
+    ClientInfo& client = (*this->clients[index]);
     std::string abs_path;
 
     if(dir[0] == '/')
@@ -189,7 +189,7 @@ void Server::loopAcceptConn()
                 sock.close();
             else
             {
-                this->clients.push_back(new Client(std::move(sock), ip, port));
+                this->clients.push_back(new ClientInfo(std::move(sock), ip, port));
                 this->handlers.push_back(new Thread(&Server::handleClient, this, this->clients.size() - 1));
 
                 for(std::size_t i = 0; i < this->handlers.size(); ++i)
@@ -211,7 +211,7 @@ void Server::loopAcceptConn()
 
 void Server::handleClient(std::size_t index)
 {
-    Client& client = (*this->clients[index]);
+    ClientInfo& client = (*this->clients[index]);
     if(this->handleClientInit(client) == false)
         return;
 
@@ -280,7 +280,7 @@ void Server::handleClient(std::size_t index)
     client.sock.close();
 }
 
-bool Server::handleClientInit(Client& client)
+bool Server::handleClientInit(ClientInfo& client)
 {
     Lock(client.mutex);
 
@@ -337,7 +337,7 @@ bool Server::handleClientInit(Client& client)
 
 int Server::executeClientCommand(std::size_t index, const std::vector<std::string>& cmd, int stdinfd, int stdoutfd, int stderrfd, bool async)
 {
-    Client& client = (*this->clients[index]);
+    ClientInfo& client = (*this->clients[index]);
     Lock(this->mutex);
     Lock(client.mutex);
 
@@ -530,7 +530,7 @@ void Server::loopInterface()
     }
 }
 
-bool Server::executeServerCommand(Client& client)
+bool Server::executeServerCommand(ClientInfo& client)
 {
 
     uint8_t code;

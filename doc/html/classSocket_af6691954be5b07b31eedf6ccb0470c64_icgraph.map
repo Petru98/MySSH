@@ -1,0 +1,17 @@
+<map id="Socket::recv" name="Socket::recv">
+<area shape="rect" id="node2" href="$classClient.html#adff18efbeb86be1ee27d3562ff00ccc4" title="Client::loop" alt="" coords="363,5,451,32"/>
+<area shape="rect" id="node4" href="$classSocket.html#abc462735f57e2675b03b8b439b6c37ed" title="Socket::recvRaw" alt="" coords="153,107,276,133"/>
+<area shape="rect" id="node8" href="$classSocket.html#a8a304732c2f7424a68816e23e0e98b1f" title="Socket::recv8" alt="" coords="163,56,266,83"/>
+<area shape="rect" id="node10" href="$classSocket.html#af4693b5c4e004194d7a728ee6e228cb9" title="Socket::recv16" alt="" coords="159,157,270,184"/>
+<area shape="rect" id="node11" href="$classSocket.html#a478b8ad2301c49981b34588960bb82d5" title="Socket::recv32" alt="" coords="159,208,270,235"/>
+<area shape="rect" id="node12" href="$classSocket.html#a4bc1365c7228b37e7226427da55cf799" title="Socket::recvString" alt="" coords="149,259,280,285"/>
+<area shape="rect" id="node3" href="$classClient.html#a4b58c2aaefda7db6e866074762d4ff8e" title="Client::run" alt="" coords="580,56,663,83"/>
+<area shape="rect" id="node5" href="$classSocket.html#ab22958cae10d4173a0bd5e5b6b3b9e05" title="Socket::recvUnprocessed" alt="" coords="535,107,708,133"/>
+<area shape="rect" id="node6" href="$classSocket.html#ac31e20c2da76a84189bd9b22531d7d23" title="Socket::recvSize" alt="" coords="346,157,469,184"/>
+<area shape="rect" id="node7" href="$classSocket.html#a6d9579a97d65a8ed966e79196e1d7b35" title="Socket::recv" alt="" coords="573,157,669,184"/>
+<area shape="rect" id="node9" href="$classClient.html#ab5a45e6a2958400467102348869b650c" title="Client::init" alt="" coords="367,56,448,83"/>
+<area shape="rect" id="node13" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="551,233,691,260"/>
+<area shape="rect" id="node16" href="$classServer.html#a5d75d07bee3527777337446334bafac8" title="Server::handleClientInit" alt="" coords="328,259,487,285"/>
+<area shape="rect" id="node14" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="756,233,920,260"/>
+<area shape="rect" id="node15" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="968,233,1055,260"/>
+</map>

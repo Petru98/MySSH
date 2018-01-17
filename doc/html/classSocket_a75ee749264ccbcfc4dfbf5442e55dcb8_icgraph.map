@@ -1,0 +1,10 @@
+<map id="Socket::close" name="Socket::close">
+<area shape="rect" id="node2" href="$classClient.html#ac281d70a5e40f98bb16a0760d0975cc0" title="Client::free" alt="" coords="183,5,269,32"/>
+<area shape="rect" id="node4" href="$classServer.html#ae593fb8fdc15760fc1feb3511af970d2" title="Server::free" alt="" coords="381,81,471,108"/>
+<area shape="rect" id="node6" href="$classServer.html#a26675bfa3a04d5bef1aee4a3c91b8d96" title="Server::loopAcceptConn" alt="" coords="344,145,508,172"/>
+<area shape="rect" id="node7" href="$classServer.html#a29e10f05cf885e670483766d54042784" title="Server::handleClient" alt="" coords="156,157,296,184"/>
+<area shape="rect" id="node8" href="$classSocket.html#aeac4eb6379a543d38ed88977d3b6630a" title="Socket::~Socket" alt="" coords="166,208,286,235"/>
+<area shape="rect" id="node9" href="$classSocket.html#a179c1d8c3f24a4be8ea6b6a74b2b1d48" title="Socket::accept" alt="" coords="171,259,281,285"/>
+<area shape="rect" id="node3" href="$classClient.html#a4b58c2aaefda7db6e866074762d4ff8e" title="Client::run" alt="" coords="385,5,467,32"/>
+<area shape="rect" id="node5" href="$classServer.html#a504b578b0a75cf616b6bd464bb335246" title="Server::run" alt="" coords="556,108,643,135"/>
+</map>

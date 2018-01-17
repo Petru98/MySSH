@@ -1,0 +1,7 @@
+<map id="Thread::Error" name="Thread::Error">
+<area shape="rect" id="node3" href="$classThread_1_1AlreadyLaunchedError.html" title="Thread::AlreadyLaunchedError" alt="" coords="299,5,497,32"/>
+<area shape="rect" id="node4" href="$classThread_1_1DetachError.html" title="Thread::DetachError" alt="" coords="328,56,468,83"/>
+<area shape="rect" id="node5" href="$classThread_1_1JoinError.html" title="Thread::JoinError" alt="" coords="337,107,459,133"/>
+<area shape="rect" id="node6" href="$classThread_1_1LaunchError.html" title="Thread::LaunchError" alt="" coords="328,157,468,184"/>
+<area shape="rect" id="node7" href="$classThread_1_1NotLaunchedError.html" title="Thread::NotLaunchedError" alt="" coords="311,208,485,235"/>
+</map>

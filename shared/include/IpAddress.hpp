@@ -6,127 +6,59 @@
 #include <netdb.h>
 #include <cstdint>
 #include <string>
-#include <exception>
+#include <system_error>
 
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Class representing an IPv4 address.
-////////////////////////////////////////////////////////////////////////////////
+
+
 class IpAddress
 {
 public:
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Base class for the other error classes that might be thrown.
-    ////////////////////////////////////////////////////////////////////////////////
-    class Error : public std::exception
-    {};
+    class Error : public std::system_error
+    {
+    public:
+        using std::system_error::system_error;
+        Error(const char* what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(const std::string& what_arg) : std::system_error(0, std::generic_category(), what_arg) {};
+        Error(int code, const char* what_arg) : std::system_error(code, std::system_category(), what_arg) {};
+        Error(int code, const std::string& what_arg) : std::system_error(code, std::system_category(), what_arg) {};
+    };
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Error thrown when getting IP address from host name fails.
-    ////////////////////////////////////////////////////////////////////////////////
-    class GetHostAddressError : public Error
-        {public: virtual const char* what() {return "Could not convert string to IP address because of an unknown error";}};
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Error thrown when the IP address or host name is invalid.
-    ////////////////////////////////////////////////////////////////////////////////
-    class InvalidAddressError : public Error
-        {public: virtual const char* what() {return "Could not convert string to IP address because it is not valid";}};
+    class GetHostAddressError : public Error {public: using Error::Error;};
+    class InvalidAddressError : public Error {public: using Error::Error;};
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Default constructor.
-    /// \details This constructor sets the address to "0.0.0.0".
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress();
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Copy constructor.
-    /// \param that IP address to copy
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress(const IpAddress& that);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Construct the address from a string.
-    /// \details The parameter can be either an ip address (ex: 192.168.1.1), or a
-    ///          host name (ex: localhost).
-    /// \param address IP address or host name
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress(const std::string& address);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Assign from 32-bit unsigned integer with internal representation.
-    /// \details This constructor is safe only if \a address has a value returned by
-    ///          toInt().
-    /// \param address 32-bit unsigned integer representing the address
-    /// \sa toInt()
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress(uint32_t address);
 
-
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Copy address from another object.
-    /// \param that IP address to copy
-    /// \return Reference to \a this
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress& operator= (const IpAddress& that);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Assign address from string.
-    /// \details This method throws one of two errors on failure.
-    /// \param address IP address or host name
-    /// \return Reference to \a this
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress& operator= (const std::string& address);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Assign from 32-bit unsigned integer with internal representation.
-    /// \details This method is safe only if \a address has a value returned by
-    ///          toInt().
-    /// \param address 32-bit unsigned integer representing the address
-    /// \return Reference to \a this
-    /// \sa toInt()
-    ////////////////////////////////////////////////////////////////////////////////
     IpAddress& operator= (uint32_t address);
 
-
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Convert IP address to string.
-    /// \return String representation of the IP address
-    ////////////////////////////////////////////////////////////////////////////////
     std::string toString() const;
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Convert IP address to a 32-bit integer with internal representation.
-    /// \return 32-bit integer representing the IP address
-    ////////////////////////////////////////////////////////////////////////////////
     uint32_t toInt() const;
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Compare 2 IP addresses for equality.
-    /// \param lval Left operand
-    /// \param rval Right operand
-    /// \return True if both IP addresses are equal
-    ////////////////////////////////////////////////////////////////////////////////
     friend bool operator== (const IpAddress& lval, const IpAddress& rval);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Compare 2 IP addresses for inequality.
-    /// \param lval Left operand
-    /// \param rval Right operand
-    /// \return True if the IP addresses are different
-    ////////////////////////////////////////////////////////////////////////////////
     friend bool operator!= (const IpAddress& lval, const IpAddress& rval);
 
 
 
-    static const IpAddress Any; ///< Value representing any address
+    static const IpAddress Any;
 
 private:
-    in_addr address; ///< IP address
+    in_addr address;
 };
 #endif
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class IpAddress
+/// \ingroup shared
+////////////////////////////////////////////////////////////////////////////////

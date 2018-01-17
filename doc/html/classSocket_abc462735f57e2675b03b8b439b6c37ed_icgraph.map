@@ -1,0 +1,5 @@
+<map id="Socket::recvRaw" name="Socket::recvRaw">
+<area shape="rect" id="node2" href="$classSocket.html#ab22958cae10d4173a0bd5e5b6b3b9e05" title="Socket::recvUnprocessed" alt="" coords="347,5,520,32"/>
+<area shape="rect" id="node3" href="$classSocket.html#ac31e20c2da76a84189bd9b22531d7d23" title="Socket::recvSize" alt="" coords="176,56,299,83"/>
+<area shape="rect" id="node4" href="$classSocket.html#a6d9579a97d65a8ed966e79196e1d7b35" title="Socket::recv" alt="" coords="385,56,481,83"/>
+</map>

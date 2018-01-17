@@ -1,6 +1,6 @@
 #include <FileDescriptor.hpp>
 #include <unistd.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
 
 
@@ -30,7 +30,7 @@ std::size_t FileDescriptor::read(void* buffer, std::size_t size)
     {
         if(errno == EAGAIN || errno == EWOULDBLOCK)
             return 0;
-        throw ReadError(errno, buffer, size);
+        throw ReadError(errno, "could not read from file descriptor");
     }
 
     return static_cast<std::size_t>(read);
@@ -42,7 +42,7 @@ std::size_t FileDescriptor::write(const void* buffer, std::size_t size)
     {
         if(errno == EAGAIN || errno == EWOULDBLOCK)
             return 0;
-        throw WriteError(errno, buffer, size);
+        throw WriteError(errno, "could not write to file descriptor");
     }
 
     return static_cast<std::size_t>(written);
