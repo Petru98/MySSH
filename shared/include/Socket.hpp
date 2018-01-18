@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <string>
 #include <vector>
+#include <cassert>
 #include <system_error>
 #include "IpAddress.hpp"
 #include "FileDescriptor.hpp"
@@ -123,13 +124,13 @@ protected:
 template <typename Container>
 void Socket::sendUnprocessed(const Container& container, int flags)
 {
-    return this->sendUnprocessed(container.data(), container.size(), flags);
+    return this->sendUnprocessed(&container[0], container.size() * sizeof(container[0]), flags);
 }
 
 template <typename Container>
 void Socket::send(const Container& container, int flags)
 {
-    return this->send(container.data(), container.size(), flags);
+    return this->send(&container[0], container.size() * sizeof(container[0]), flags);
 }
 
 
@@ -138,7 +139,9 @@ template <typename Container>
 std::size_t Socket::recvUnprocessed(Container& container, int flags)
 {
     const std::size_t packet_size = this->recvSize(flags);
-    container.resize(packet_size);
+    assert(packet_size % sizeof(container[0]) == 0);
+    container.resize(packet_size / sizeof(container[0]));
+
     this->recvRaw(&container[0], packet_size, flags);
     return packet_size;
 }
@@ -147,10 +150,11 @@ template <typename Container>
 std::size_t Socket::recv(Container& container, int flags)
 {
     const std::size_t content_size = this->recvSize(flags);
-    container.resize(content_size);
+    assert(content_size % sizeof(container[0]) == 0);
+    container.resize(content_size / sizeof(container[0]));
 
     this->recvUnprocessed(this->buffer, flags);
-    this->onReceive((uint8_t*)(&container[0]), container.size());
+    this->onReceive((uint8_t*)(&container[0]), content_size);
     return content_size;
 }
 

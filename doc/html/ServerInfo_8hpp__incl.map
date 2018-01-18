@@ -1,6 +1,6 @@
 <map id="client/include/ServerInfo.hpp" name="client/include/ServerInfo.hpp">
-<area shape="rect" id="node2" href="$PgpSocket_8hpp.html" title="PgpSocket.hpp" alt="" coords="287,80,397,107"/>
-<area shape="rect" id="node3" href="$Socket_8hpp.html" title="Socket.hpp" alt="" coords="238,155,326,181"/>
-<area shape="rect" id="node9" href="$IpAddress_8hpp.html" title="IpAddress.hpp" alt="" coords="229,229,335,256"/>
-<area shape="rect" id="node13" href="$FileDescriptor_8hpp.html" title="FileDescriptor.hpp" alt="" coords="359,229,487,256"/>
+<area shape="rect" id="node2" href="$PgpSocket_8hpp.html" title="PgpSocket.hpp" alt="" coords="357,80,468,107"/>
+<area shape="rect" id="node3" href="$Socket_8hpp.html" title="Socket.hpp" alt="" coords="309,155,397,181"/>
+<area shape="rect" id="node10" href="$IpAddress_8hpp.html" title="IpAddress.hpp" alt="" coords="229,229,335,256"/>
+<area shape="rect" id="node14" href="$FileDescriptor_8hpp.html" title="FileDescriptor.hpp" alt="" coords="359,229,487,256"/>
 </map>
