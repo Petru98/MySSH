@@ -73,7 +73,7 @@ void Client::init(int argc, char** argv)
 
     this->server.sock.send(buffer);
     if(this->server.sock.recv8() != 1)
-        throw std::runtime_error("no user with this username exists");
+        throw std::runtime_error("no user with this username exists, or user is already logged in");
 
     // Password
     std::cout << "password: ";

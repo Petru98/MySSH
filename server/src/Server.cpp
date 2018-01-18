@@ -297,6 +297,7 @@ bool Server::handleClientInit(ClientInfo& client)
 
     // Username
     client.sock.recvString(buffer);
+    Lock(this->mutex);
 
     tinyxml2::XMLElement* user_info = this->findUser(buffer.c_str());
     if(user_info == nullptr)
@@ -304,6 +305,13 @@ bool Server::handleClientInit(ClientInfo& client)
         client.sock.send8(0);
         return false;
     }
+
+    for(std::size_t i = 0; i < this->clients.size(); ++i)
+        if(this->clients[i]->name == buffer)
+        {
+            client.sock.send8(0);
+            return false;
+        }
 
     client.name = std::move(buffer);
     client.home = this->home_dir + '/' + client.name;
