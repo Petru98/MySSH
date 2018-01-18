@@ -45,13 +45,24 @@ Usage: `./myssh-client [IP] [PORT]`
 
 *IP* represents the server's IP address (127.0.0.1 by default) and *PORT* represents the port the server is listening to (1100 by default).
 
-Once the initialization is done and the client connects to the server, you will be prompted for your user name and password. In order to use an account it must exist in the server's database. After logging in successfully, you will be able to run non-interactive commands in a special folder on the server which represents your home directory.
+Once the initialization is done and the client connects to the server, you will be prompted for your user name and password. In order to use an account it must exist in the server's database. After logging in successfully, you will be able to run non-interactive commands (like the ones from bash) in a special folder on the server which represents your home directory.
 
 You can link multiple commands with the following:
-- `COMMAND1 ; COMMAND2 [...]` - execute commands in order, from left to right
+- `COMMAND1 ; COMMAND2` - execute commands in order, from left to right
+- `COMMAND1 && COMMAND2` - execute commands in order, from left to right, until a command returns error, or until all commands were executed
+- `COMMAND1 || COMMAND2` - execute commands in order, from left to right, until a command returns success, or until all commands were executed
+- `COMMAND1 | COMMAND2` - execute the commands and redirect the stdout and stderr from *COMMAND1* to stdin from *COMMAND2*
+
+You can also redirect input/output from/to files as follows:
+- `COMMAND < FILE` - read input from *FILE* instead of keyboard
+- `COMMAND > FILE` - redirect stdout to *FILE* instead of screen
+- `COMMAND 2> FILE` - redirect stderr to *FILE* instead of screen
+
+To log out you must use `exit`.
 
 
 
 ## Bibliography
 - https://profs.info.uaic.ro/~computernetworks/files/NetEx/S12/ServerConcThread/servTcpConcTh2.c
 - https://profs.info.uaic.ro/~computernetworks/files/NetEx/S9/servTcpCSel.c
+- https://github.com/leethomason/tinyxml2/blob/master/xmltest.cpp
