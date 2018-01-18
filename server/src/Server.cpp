@@ -344,6 +344,13 @@ int Server::executeClientCommand(std::size_t index, const std::vector<std::strin
     if(cmd[0] == "exit")
         throw ExitEvent();
 
+    if(cmd[0] == "pwd")
+    {
+        client.sock.send8(1);
+        client.sock.send(client.cwd + '\n');
+        return 0;
+    }
+
     if(cmd[0] == "cd")
     {
         if(cmd.size() == 1)

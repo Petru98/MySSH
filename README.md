@@ -43,7 +43,7 @@ In order for clients to log in, they need an account which you must create using
 ### Client
 Usage: `./myssh-client [IP] [PORT]`
 
-*IP* represents the server's IP address (127.0.0.1 by default) and *PORT* represents the port the server is listening to (1100 by default).
+*IP* represents the server's IP address (127.0.0.1 by default), or a host name (www.host.example). *PORT* represents the port the server is listening to (1100 by default).
 
 Once the initialization is done and the client connects to the server, you will be prompted for your user name and password. In order to use an account it must exist in the server's database. After logging in successfully, you will be able to run non-interactive commands (like the ones from bash) in a special folder on the server which represents your home directory.
 
